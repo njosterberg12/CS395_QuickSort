@@ -1,0 +1,362 @@
+<!DOCTYPE HTML>
+<html>
+    <head>
+		<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	    <!-- Chrome browser will display response in the form of html page by using above line. -->	
+		<link rel="stylesheet" href="general.css">
+		<script type="text/javascript" src="../general.js"></script>
+		<script type="text/javascript" src="../tableFunctions.js"></script>
+		<script type="text/javascript" src="../headerFunction.js"></script>
+		<script type="text/javascript" src="../pseudocodeFunctions.js"></script>
+        <script type="text/javascript">
+			var numElements = 1;
+			var kCapacity = 1;
+			var myTableId = "myTable";
+			var myPseudocodeTableId = "myPseudocodeTable";
+			var currentState = 1;
+			
+			function funNumElements() {
+
+			   numElements = parseInt(document.getElementById("NumElements").value, 10);
+			   //sayIt("You chose " + numElements);
+			   createKTable();
+			}
+			
+			function funKCapacity() {
+			   kCapacity = parseInt(document.getElementById("KCapacity").value, 10);
+			   //alert("You chose capacity " + kCapacity);
+			   createKTable();
+			}
+			
+			function createKTable() {
+			   createTable(myTableId, kCapacity + 4, numElements + 2);
+			   setCell(myTableId,0,1,"Wt");
+			   setCell(myTableId,1,1,"Val");
+			   setCellColor(myTableId, 0, 1, "yellow");
+			   setCellColor(myTableId, 1, 1, "yellow");
+			   setCell(myTableId,2,0,"i\\cap");
+			   for(y=2; y< numElements + 2; y++) {
+				  setCellAsInputBoxAndHighlight(myTableId, 0, y, "yellow", getRandomCount(kCapacity));
+				  setCellAsInputBoxAndHighlight(myTableId, 1, y, "yellow", getRandomCount(15));
+			   }
+			   for(y=0; y <= numElements; y++) {
+			      setCell(myTableId,2,y+1,y);
+				  setCellBorder(myTableId, 2,y+1, "1px solid black");
+			   }
+			   
+			   for(x=0; x <= kCapacity; x++) {
+			      setCell(myTableId,x+3,0,x);
+				  setCellBorder(myTableId, x+3,0, "1px solid black");
+			   }
+			   
+			   currentState = 1;
+			   createPseudocodeTable(myPseudocodeTableId);
+			   appendPseudocodeTable(myPseudocodeTableId, "When you are done choosing the number of elements and knapsack capacity, set the weights and values to some initial state. (They are set to random values now).", "Done");
+			   
+			}
+			
+			// Within a step, check to see if the input is correct
+			var stepRow = 0;
+			var stepCol = 0;
+			function inputBoxChanged(myTableId, x, y) {
+			    var newValue = parseInt(getInputCellValue(myTableId, x,y), 10);
+				if(currentState == 1)
+			    {
+					if(newValue < 1 || isNaN(newValue))
+					{
+					   if(x==0)
+						  sayIt("Weights must be integers that are at least 1");
+					   if(x==1)
+						  sayIt("Values must be integers that are at least 1");
+					   setInputCell(myTableId, x,y,"1");
+					}
+					if(newValue > kCapacity && x==0)
+					{
+						sayIt("Your knapsack will only hold " + kCapacity + ". " + newValue + " will not even fit. It is OK, but redundant.");
+					}
+				}
+				else if(currentState == 2)
+				{
+				  var allOK = true;
+				  for(y=2; y< numElements + 2; y++) {
+				     if(getInputCellValue(myTableId, 3, y) == " ")
+					    setInputCellColor(myTableId, 3, y, "yellow");
+					 else if(parseInt(getInputCellValue(myTableId, 3,y), 10) == 0)
+					    setInputCellColor(myTableId, 3, y, "white");
+					 else {
+					    setInputCellColor(myTableId, 3, y, "red");
+						if(allOK == true)
+						   sayIt("Set the values to 0");
+						allOK = false;						
+					 }
+					 if(getInputCellValue(myTableId, 3,y) == " ")
+					    allOK = false;
+				  }
+				  for(x=3; x <= kCapacity + 3; x++) {
+				     if(getInputCellValue(myTableId, x,1) == " " || parseInt(getInputCellValue(myTableId, x,1), 10) == 0)
+					    setInputCellColor(myTableId, x, 1, "yellow");
+					 else {
+					    setInputCellColor(myTableId, x, 1, "red");
+						if(allOK == true)
+						   sayIt("Set the values to 0");
+						allOK = false;
+					 }
+					 if(getInputCellValue(myTableId, x,1) == " ")
+					    allOK = false;
+			      }
+				  if(allOK == true)
+				     nextStep();
+				}
+				else if(currentState == 3)
+				{	
+			      var rowWeight = parseInt(getCellValue(myTableId, 0,stepRow), 10);
+			      var rowValue = parseInt(getCellValue(myTableId, 1,stepRow), 10);
+				  var expectedValue = parseInt(getCellValue(myTableId, stepCol, stepRow - 1), 10);
+				  if(stepCol > rowWeight + 2)
+				  {
+				     var otherOption = rowValue + parseInt(getCellValue(myTableId, stepCol - rowWeight, stepRow - 1), 10);
+					 if(otherOption > expectedValue)
+					    expectedValue = otherOption;
+				  }
+				  if(newValue == expectedValue)
+				  {
+				     stepCol = stepCol + 1;
+					 doOneCell();
+				  }
+				  else 
+				  {
+				     setInputCellColor(myTableId, stepCol, stepRow, "red");
+					 explainOneCell();
+				  }
+				}
+				//alert("It worked " + newValue);
+			}
+
+			function explainOneCell() {
+			      var rowWeight = parseInt(getCellValue(myTableId, 0,stepRow), 10);
+			      var rowValue = parseInt(getCellValue(myTableId, 1,stepRow), 10);
+				  var expectedValue = parseInt(getCellValue(myTableId, stepCol, stepRow - 1), 10);	
+                  var otherOption = expectedValue;
+				  if(stepCol > rowWeight + 2)
+				  {
+				     var previousValue = parseInt(getCellValue(myTableId, stepCol - rowWeight, stepRow - 1), 10);
+				     var otherOption = rowValue + previousValue;
+					 if(otherOption > expectedValue)
+					 {
+					    sayIt("" + rowValue + " plus " + previousValue + " is greater than " + expectedValue);
+					    expectedValue = otherOption;
+					 }
+					 else
+					 {
+					 	sayIt("" + expectedValue + " is greater than " + (expectedValue + rowValue) + " plus " + previousValue);
+					 }
+				  }
+                  else
+                  {
+				     sayIt("You have no choice here. Just set the value to the same value as the cell above it.");
+                  }
+                  return(expectedValue);				  			  
+            }
+			
+			function doOneCell() {
+			   var rowWeight = parseInt(getCellValue(myTableId, 0,stepRow), 10);
+			   if(stepCol != 4) { // Not the first column so clean up the last one.
+			      setCellColor(myTableId, stepCol-1, stepRow-1, "white");
+				  setCellAsTextBox(myTableId, stepCol-1, stepRow);
+			   }
+			   if(stepCol >= kCapacity + 4) { // gone past the end
+			      setCellColor(myTableId, 0, stepRow, "white");
+			      setCellColor(myTableId, 1, stepRow, "white");
+			      if(stepCol > rowWeight + 2)
+			      {
+			         setCellColor(myTableId, stepCol-rowWeight-1, stepRow-1, "white");
+                  }				  
+			      stepCol = parseInt("4", 10);
+				  stepRow = stepRow + 1;
+				  if(stepRow > numElements + 1) {
+				     nextStep();
+					 return;
+				  }
+				  doOneRow();
+				  return;
+			   }
+			   if(stepCol > rowWeight + 2)
+			   {
+			      setCellColor(myTableId, stepCol-rowWeight-1, stepRow-1, "white");
+				  setCellColor(myTableId, stepCol-rowWeight, stepRow-1, "orange");
+			   }
+			   setCellColor(myTableId, stepCol, stepRow-1, "yellow");
+			   setCellAsInputBoxAndHighlight(myTableId, stepCol, stepRow, "yellow", " ");
+            }
+			
+			function doOneRow() {
+			   var rowWeight = parseInt(getCellValue(myTableId, 0,stepRow), 10);
+
+			   setCellColor(myTableId, 0, stepRow, "yellow");
+			   setCellColor(myTableId, 1, stepRow, "orange");
+			   var msg = "   Since row " + (stepRow - 1) + " has a weight of " + rowWeight + ", set the first ";
+			   if (rowWeight == 1)
+			      msg = msg + "column";
+			   else
+			      msg = msg + rowWeight + " columns";
+			   msg = msg + " to the value directly above it. Then set the rest to the max of the value directly above and the value of this item+the value " + rowWeight + " columns back."
+			   appendPseudocodeTable(myPseudocodeTableId, msg, "Show Me");
+			   doOneCell();
+			}
+
+			function choseNo() {
+			   showMeWhatsIn(false);
+			}
+			
+			function choseYes() {
+			   showMeWhatsIn(true);
+			}
+			
+			function showMeWhatsIn(theirAnswer) {
+			   
+			  var rowWeight = parseInt(getCellValue(myTableId, 0,stepRow), 10);
+			  if(parseInt(getCellValue(myTableId, stepCol,stepRow), 10) == parseInt(getCellValue(myTableId, stepCol,stepRow-1), 10))
+			  { // not in
+				 setCellColor(myTableId, 2, stepRow, "red");
+				 setCellColor(myTableId, stepCol, stepRow, "red");
+				 setCellColor(myTableId, stepCol, stepRow-1, "red");
+				 if(theirAnswer == false)
+					sayIt("You are right!");
+				 else
+				    sayIt("The value is the same as the one above it, so it is not in.");
+			  }
+			  else
+			  { // in
+				 setCellColor(myTableId, 2, stepRow, "green");
+				 setCellColor(myTableId, stepCol, stepRow, "green");
+				 setCellColor(myTableId, stepCol, stepRow-1, "green");
+				 if(theirAnswer == true)
+					sayIt("You are right!");
+				 else
+				    sayIt("The value is different from the one above it, so it is in.");
+					sayIt("Don't forget to subtract the weight of this element from the column number when you try to decide if the next element is in.");
+				 stepCol = stepCol - rowWeight;
+			  }
+			  if(stepRow<3) {
+			      appendPseudocodeTable(myPseudocodeTableId, "Well done! You solved the problem. Do you want to reset the page?", "Reset");
+				  return;
+              }
+			  stepRow = stepRow - 1;
+			  appendPseudocodeQuestion(myPseudocodeTableId, "   Is element " + (stepRow-1) + " in the solution?", "Yes", "No");
+			}			
+			
+			// Move to the next step
+			function nextStep() {
+			   if(currentState == 1)
+			   {
+			      setCellColor(myTableId, 0, 1, "white"); // Clean up step 1
+			      setCellColor(myTableId, 1, 1, "white"); // Clean up step 1
+			      for(y=2; y< numElements + 2; y++) {
+				     setCellAsTextBox(myTableId, 0 ,y); // Clean up step 1
+			         setCellAsTextBox(myTableId, 1 ,y); // Clean up step 1
+				     setCellAsInputBoxAndHighlight(myTableId, 3, y, "yellow", " ");
+				  }
+				  for(x=3; x <= kCapacity + 3; x++) {
+				     setCellAsInputBoxAndHighlight(myTableId, x, 1, "yellow", " ");
+			      }
+				  appendPseudocode(myPseudocodeTableId, "For loops");
+				  appendPseudocodeTable(myPseudocodeTableId, "   Set row 0 and column 0 all to 0s", "Show Me");
+			   }
+			   else if(currentState == 2)
+			   {
+			      for(y=2; y< numElements + 2; y++) {
+					 setCellAsTextBox(myTableId,3,y); // Clean up step 2
+					 setCell(myTableId, 3,y, "0");    // Clean up step 2
+				  }
+				  for(x=3; x <= kCapacity + 3; x++) {
+			         setCellAsTextBox(myTableId,x,1);
+					 setCell(myTableId, x, 1, "0");
+			      }
+				  stepRow = parseInt("2", 10);
+				  stepCol = parseInt("4", 10);
+				  appendPseudocode(myPseudocodeTableId, "Nested for loop: V[i,j] = if (j - wi < 0) V[i-1, j] otherwise max {V[i-1, j], vi + V[i-1, j- wi]}");
+				  doOneRow(stepRow);
+			   }
+			   else if(currentState == 3)
+			   {
+			      if(stepRow < numElements + 2) {
+                     var realValue = explainOneCell();				  
+				     setInputCell(myTableId, stepCol, stepRow, realValue);
+                     inputBoxChanged(myTableId, stepCol, stepRow);
+                     return;					 
+                  }	
+				  stepRow = parseInt("1", 10) + numElements;
+				  stepCol = parseInt("3", 10) + kCapacity;
+				  appendPseudocode(myPseudocodeTableId, "For loop");
+				  appendPseudocodeQuestion(myPseudocodeTableId, "   Is element " + (stepRow-1) + " in the solution?", "Yes", "No");				  
+			   }
+			   else if(currentState == 4)
+			   {
+				  location.reload();
+			   }
+			   currentState = parseInt(currentState,10) + 1;
+			}
+			function welcome() {
+              sayIt("The knapsack problem is a problem in combinatorial optimization: Given a set of items, each with a weight and a value, which items to include in a collection so that the total weight is less than or equal to a given limit and the total value is as large as possible.");
+              sayIt("Using Dynamic programing we break the problem down into sub problems (like divide and conquer), except that we keep a record of each sub-problem's solution so that it does not have to be recomputed."); 
+
+			}
+						
+        </script>
+    </head>
+
+<body onload="welcome()">
+  <!-- Header -->	
+  <script>
+	createHeader("The Knapsack problem using dynamic programming");
+ </script>
+	
+  <p>The knapsack problem is a problem in combinatorial optimization: Given a set of items, each with a weight and a value, which items to include in a collection so that the total weight is less than or equal to a given limit and the total value is as large as possible. </p>
+  <p>Using Dynamic programing we break the problem down into sub problems (like divide and conquer), except that we keep a record of each sub-problem's solution so that it does not have to be recomputed. </p>
+  <script>
+     //welcome();
+ </script>
+  
+  How many elements do you want to choose from?:
+  <select style="width: 80px" id="NumElements" name="NumElements">
+  <option selected="">1</option>
+     <option>2</option>
+     <option>3</option>
+     <option>4</option>
+     <option>5</option>
+     <option>6</option>
+     <option>7</option>
+     <option>8</option>
+     <option>9</option>	 
+  </select>
+  
+  <script>
+     document.getElementById("NumElements").onchange = function() {funNumElements()};
+  </script>
+  
+  <BR>
+  What is the capacity of the knapsack?:
+  <select style="width: 80px" id="KCapacity" name="KCapacity">
+  <option selected="">1</option>
+     <option>2</option>
+     <option>3</option>
+     <option>4</option>
+     <option>5</option>
+     <option>6</option>
+     <option>7</option>
+     <option>8</option>
+     <option>9</option>	 
+  </select>
+  
+  <script>
+     document.getElementById("KCapacity").onchange = function() {funKCapacity()};
+  </script>   
+  <BR>
+  <input  style="visibility:hidden;" type="button" id="ButtonShowMe" value="ShowMe" onclick="nextStep()" disabled>
+  <input  style="visibility:hidden;" type="button" id="ButtonYes" value="Yes" onclick="choseYes()" disabled>
+  <input  style="visibility:hidden;" type="button" id="ButtonNo"value="No" onclick="choseNo()" disabled>
+  
+</body>
+
+</html>

@@ -1,0 +1,191 @@
+<!DOCTYPE HTML>
+<html>
+    <head>
+		<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	    <!-- Chrome browser will display response in the form of html page by using above line. -->	
+		<link rel="stylesheet" href="general.css">
+		<link rel="stylesheet" href="4_nim.css">
+		<script type="text/javascript" src="../general.js"></script>
+		<script type="text/javascript" src="../tableFunctions.js"></script>
+		<script type="text/javascript" src="../headerFunction.js"></script>
+		<script type="text/javascript" src="../pseudocodeFunctions.js"></script>
+        <script type="text/javascript">
+			var numStones = 5;
+			var numStacks = 3;
+			
+			var stacks = [1,1,1,1,1];
+			var maxHeight = 25;
+			var turn = 0;
+			
+			var myTableId = "myTable";
+			var playerTableId = "playerTable";
+			var hintTableId = "hintTable";
+			var myPseudocodeTableId = "myPseudocodeTable";
+			
+			var showHints = false;
+			
+			function funNumStones() {
+
+			   numStones = parseInt(document.getElementById("numStones").value, 10);
+			   //sayIt("You chose " + numStones);
+			   createTowers();
+			}
+						
+			function buttonClicked(stack, value){
+				for(y=value; y <= stacks[stack]; y++)
+				   deleteCell(myTableId, stack, y);
+				setStackHeight(stack, value-1);
+				var coinsLeft = 0;
+				var i;
+				for (var i = 0; i < numStacks; ++i)
+				   coinsLeft += stacks[i];
+				if(coinsLeft == 0)
+				{
+					sayIt("Well done Player " + (turn+1));
+					return;
+				}
+				turn = (turn + 1) % 2;
+				if(turn == 0)
+				{
+				   setCellColor(playerTableId, 0,0,"#F1B300");
+				   setCellColor(playerTableId, 1,0,"white");
+				}
+				else
+				{
+				   setCellColor(playerTableId, 1,0,"#F1B300");
+				   setCellColor(playerTableId, 0,0,"white");
+				}
+			}
+
+			function setStackHeight(stack, height) {
+				stacks[stack] = height;
+				setCell(myTableId,stack,0, height+"="+height.toString(2));
+				centerCell(myTableId, stack,0);
+			}
+			
+			function indexOfTopCell(myTableId, x ) {
+				var myTable = document.getElementById(myTableId);
+				var y;
+				for(y=0; y < numStones; y++) {
+					var mycell = myTable.rows[y].cells[x];
+					if (mycell.hasChildNodes() && mycell.childNodes[0].type == "button")
+						return y;
+				} 
+				return y;
+			}  
+
+			function getButtonValueAt(myTableId, x, y ) {
+				var myTable = document.getElementById(myTableId);
+				var mycell = myTable.rows[y].cells[x];
+				if (mycell.hasChildNodes() && mycell.childNodes[0].type == "button") {
+					return parseInt(mycell.childNodes[0].value, 10);
+				} 
+				return 0;
+			}       			
+			
+			function moveElement(fromx, tox) {
+			   var fromy = indexOfTopCell(myTableId, fromx );
+			   var toy = indexOfTopCell(myTableId, tox);
+			   if(fromy >= numStones) {
+					sayIt("There is nothing in that tower");
+					return;
+			   }
+			   if(toy < numStones) {
+			   	  var fromValue = getButtonValueAt(myTableId, fromx, fromy);
+			   	  var toValue = getButtonValueAt(myTableId, tox, toy);
+				  if(fromValue > toValue)
+				  {
+					sayIt("You can't put a " + fromValue + " on a " + toValue);
+					return;
+				  }
+			   }
+
+			   moveCellObject(myTableId, fromx, fromy, tox, toy-1);
+			}			
+
+			function addButtonAt(x,y,label) {
+			  var btn = document.createElement('input');
+			  btn.type = "button";
+			  //btn.className = "button button4";
+			  //btn.setAttribute("id", "button" + (y+1));
+			  btn.value = label;
+			  btn.style["width"] = "100%";
+			  btn.onclick = (function(){onClickFunction});
+			  setCellAsObject(myTableId, x,y, btn);	
+			  centerCell(myTableId, x,y);
+			  return btn;
+			}
+		
+			function createTowers() {
+				var i;
+				var x;
+				var y;
+				createTableWithWidth(myTableId, numStacks, numStones+2, "100%");
+				  
+				for(y=0; y < numStones; y++)
+				{
+				  var btn = document.createElement('input');
+				  btn.type = "button";
+				  btn.className = "button button4";
+				  btn.setAttribute("id", "button" + (y+1));
+				  btn.value = y+1;
+				  btn.style["width"] = "" + (100 - ((numStones - y)*10)) +"%";
+				  setCellAsObject(myTableId, 0,y, btn);	
+				  centerCell(myTableId, 0,y);
+				  centerCell(myTableId, 1,y);
+				  centerCell(myTableId, 2,y);
+				  setCellHeight(myTableId, 0,y, "30px");
+				} 
+				btn = addButtonAt(0,y,"Move to B ->");
+				btn.onclick = (function(){ moveElement(0,1)});
+				btn = addButtonAt(1,y,"Move to C ->");
+				btn.onclick = (function(){ moveElement(1,2)});
+				btn = addButtonAt(2,y,"Move to B <-");
+				btn.onclick = (function(){ moveElement(2,1)});
+				y++;
+				btn = addButtonAt(0,y,"Move to C -- >");
+				btn.onclick = (function(){ moveElement(0,2)});
+				btn = addButtonAt(1,y,"Move to A <-");
+				btn.onclick = (function(){ moveElement(1,0)});
+				btn = addButtonAt(2,y,"Move to A <--");	
+				btn.onclick = (function(){ moveElement(2,0)});
+				
+			}
+						
+			function welcome() {
+			}
+						
+        </script>
+    </head>
+
+<body onload="welcome()">
+  <!-- Header -->	
+  <script>
+	createHeader("Sieve of Eratosthenes");
+ </script>
+
+<!-- Content -->
+	
+  <p>Get all the stones to pile C (on the right), but you can only move one stone at a time and no stone can be on top of a smaller stone.</p>  
+
+    How high should the tower be?:
+  <select style="width: 80px" id="numStones" name="numStones">
+  <option selected="">1</option>
+     <option>2</option>
+     <option>3</option>
+     <option>4</option>
+     <option>5</option>	 
+  </select>
+  
+  <script>
+     document.getElementById("numStones").onchange = function() {funNumStones()};
+  </script>
+  
+  <script>
+     //welcome();
+ </script>
+
+</body>
+
+</html>
