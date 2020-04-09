@@ -10,32 +10,54 @@
 			<script type="text/javascript" src="../headerFunction.js"></script>
 			<script type="text/javascript" src="../pseudocodeFunctions.js"></script>
 			<script type="text/javascript">
-			var sortArray = 8;
-			var 
-		</script>
-	</head>
-<body onload="welcome()">
-	<!--Header-->
-	<script>
-		createHeader("Quick Sort");
-	</script>
-	<p>
-		Do a quickSort of the values in ascending order. For information about quicksort, click <a target=\"_blank\" href=\"https://en.wikipedia.org/wiki/Quicksort"> here</a>. 
-	</p>
-	<p>
-	    Input the appropriate number in the slot as to how a quickSort would sort the data.
-	</p>
-	<button id="ButtonShowMe">
-	<script>
-		//welcome();
-	</script>
-	<script>
-		document.getElementByld("KCapacity").onchange = function() {funKCapacity()};
-	</script>
-	<BR>
-	<input style="visibility:hidden;" type="button" id="ButtonShowMe" value="ShowMe" onclick="(nextStep()" disabled>
-	<input style="visibility:hidden;" type="button" id="ButtonYes" value="Yes" onclick="choseYes()" disabled>
-	<input style="visibility:hidden;" type="button" id="ButtonNo"value="No" onclick="choseNo()" disabled>
+            
+            var numElements = 1;
+				
+				function makeRandArray(){
+                    var i;
+                    var arr = [];
+					numElements = parseInt(document.getElementByID("NumElements").value, 10);
+					for(i = 0; i < numElements; i++)
+                    {
+                        arr[i] = (Math.round(Math.random()*100));
+                     //   document.getElementById("checker").innerHTML = arr[i];
+                    }
+				}
 
+			</script>
+	</head>
+	<body onload="welcome()">
+		<!--Header-->
+		<script>
+			createHeader("Quick Sort");
+		</script>
+		<p>
+			Do a quickSort of the values in ascending order. For information about quicksort, click <a target=\"_blank\" href=\"https://en.wikipedia.org/wiki/Quicksort"> here</a>. 
+		</p>
+		<p>
+			Input the appropriate number in the slot as to how a quickSort would sort the data.
+		</p>
+		<script>
+			//welcome();
+		</script>
+		How many elements do you want to choose from?:
+		<select style="width:80px" id="NumElements" name="NumElements">
+			<option>5</option>
+			<option>6</option>
+			<option>7</option>
+			<option>8</option>
+			<option>9</option>
+			<option>10</option>
+		</select>
+	
+		<script>
+			document.getElementById("NumElements").onchange = function() {makeRandArray()};
+		</script>
+		
+		<BR>
+		<input style="visibility:hidden;" type="button" id="ButtonShowMe" value="ShowMe" onclick="(nextStep())" disabled>
+		<input style="visibility:hidden;" type="button" id="ButtonYes" value="Yes" onclick="choseYes()" disabled>
+		<input style="visibility:hidden;" type="button" id="ButtonNo"value="No" onclick="choseNo()" disabled>
+	
 </body>
 </html>
