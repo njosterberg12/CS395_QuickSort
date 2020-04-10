@@ -10,8 +10,7 @@
 			<script type="text/javascript" src="../HelperFunctions/headerFunction.js"></script>
 			<script type="text/javascript" src="../HelperFunctions/pseudocodeFunctions.js"></script>
 			<script type="text/javascript">
-			var numElements = 1;
-			var kCapacity = 1; // knapsack capacity
+			var numElements = 5;
 			var myTableId = "myArray";
 			var myPseudoCodeArrayId = "myPseudocodeArray";
 			var currentNode = 0;
@@ -42,13 +41,30 @@
             //        }
 			//	}
 				function createKTable(){
-					 createTable(myTableId, kCapacity, numElements + 1);
-					 setCell(myTableId, 2, 0, "Array");
+					 createTable(myTableId, numElements + 1, 2);
+					 setCell(myTableId, 0, 0, "i:");
+					 setCell(myTableId, 0, 1, "value:");
 					 //setCellColor(myTableId, 0, 1, "yellow");
-					 for(y = 2; y < numElements + 2; y++)
+					 for(x = 0; x < numElements + 1; x++)
 					 {
-						setCellAsInputBoxAndHighlight(myTableId, 0, y, "yellow", getRandomCount(kCapacity));
+						//setCellAsInputBoxAndHighlight(myTableId, x, 0, "white", x - 1);
+						setCellColor(myTableId, x, 0, "#FFFFFF");
+						setCellBorder(myTableId, x, 0, "1px solid black");
+						if( x != 0)
+						{
+							setCell(myTableId, x, 0, x-1);
+						}
 					 }
+					 for(x = 0; x < numElements + 1; x++)
+					 {
+						setCellColor(myTableId, x, 1, "#DEDEDE");
+						setCellBorder(myTableId, x, 1, "1px solid black");
+						if( x != 0)
+						{
+							setCell(myTableId, x, 1, getRandomCount(25));
+						}
+					 }
+					
 				}
 
 			</script>
