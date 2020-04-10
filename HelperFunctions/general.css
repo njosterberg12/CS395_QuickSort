@@ -1,3 +1,7 @@
+body {
+  background-color: #FFFFFF
+}
+
 h1 {
   color: #FFFFFF;
   text-align: center;
@@ -6,12 +10,12 @@ h1 {
 p {
   color: #191919;
   font-size: 20px;
-} 
+}
 
 p.pfooter {
   color: #FFFFFF;
   font-size: 20px;
-} 
+}
 
 a {
   color: #191919;

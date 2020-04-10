@@ -4,24 +4,51 @@
 			<meta http-equiv="X-UA-Compatible" content="IE=EDGE"/>
 			<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 			<!-- Chrome browser will display response in the form of html page by using above line. -->
-			<link rel="stylesheet" href="general.css">
-			<script type="text/javascript" src="../general.js"></script>
-			<script type="text/javascript" src="../tableFunctions.js"></script>
-			<script type="text/javascript" src="../headerFunction.js"></script>
-			<script type="text/javascript" src="../pseudocodeFunctions.js"></script>
+			<link rel="stylesheet" href="../HelperFunctions/general.css">
+			<script type="text/javascript" src="../HelperFunctions/general.js"></script>
+			<script type="text/javascript" src="../HelperFunctions/tableFunctions.js"></script>
+			<script type="text/javascript" src="../HelperFunctions/headerFunction.js"></script>
+			<script type="text/javascript" src="../HelperFunctions/pseudocodeFunctions.js"></script>
 			<script type="text/javascript">
-            
-            var numElements = 1;
-				
-				function makeRandArray(){
-                    var i;
-                    var arr = [];
-					numElements = parseInt(document.getElementByID("NumElements").value, 10);
-					for(i = 0; i < numElements; i++)
-                    {
-                        arr[i] = (Math.round(Math.random()*100));
-                     //   document.getElementById("checker").innerHTML = arr[i];
-                    }
+			var numElements = 1;
+			var kCapacity = 1; // knapsack capacity
+			var myTableId = "myArray";
+			var myPseudoCodeArrayId = "myPseudocodeArray";
+			var currentNode = 0;
+			var currentX = 0;
+			var currentY = 0;
+			
+			var currentI = 0;
+			var currentJ = 0;
+			var currentK = 0;
+
+			var currentMode = 0;
+			var initialji = 0;
+
+			function funNumElements(){
+				numElements = parseInt(document.getElementById("NumElements").value, 10);
+				createKTable();
+			}
+			//	function makeRandArray(){
+            //        var i;
+            //        var arr = [];
+			//		numElements = parseInt(document.getElementByID("NumElements").value, 10);
+			//		for(i = 0; i < numElements; i++)
+            //        {
+            //            arr[i] = (Math.round(Math.random()*100));
+						//document.getElementById("checker").innerHTML = arr[i];
+			//			setCell(myTableId, arr[i]; 1, 1);
+			//			setCellColor(MyTableId, arr[i], 0, "#F1B300";
+            //        }
+			//	}
+				function createKTable(){
+					 createTable(myTableId, kCapacity, numElements + 1);
+					 setCell(myTableId, 2, 0, "Array");
+					 //setCellColor(myTableId, 0, 1, "yellow");
+					 for(y = 2; y < numElements + 2; y++)
+					 {
+						setCellAsInputBoxAndHighlight(myTableId, 0, y, "yellow", getRandomCount(kCapacity));
+					 }
 				}
 
 			</script>
@@ -32,7 +59,7 @@
 			createHeader("Quick Sort");
 		</script>
 		<p>
-			Do a quickSort of the values in ascending order. For information about quicksort, click <a target=\"_blank\" href=\"https://en.wikipedia.org/wiki/Quicksort"> here</a>. 
+			Do a quickSort of the values in ascending order. For information about quicksort, click <a target=\"_blank\" href="https://en.wikipedia.org/wiki/Quicksort"> here</a>. 
 		</p>
 		<p>
 			Input the appropriate number in the slot as to how a quickSort would sort the data.
@@ -40,7 +67,7 @@
 		<script>
 			//welcome();
 		</script>
-		How many elements do you want to choose from?:
+		How many elements do you want to sort?:
 		<select style="width:80px" id="NumElements" name="NumElements">
 			<option>5</option>
 			<option>6</option>
@@ -51,7 +78,7 @@
 		</select>
 	
 		<script>
-			document.getElementById("NumElements").onchange = function() {makeRandArray()};
+			document.getElementById("NumElements").onchange = function() {funNumElements()};
 		</script>
 		
 		<BR>

@@ -217,7 +217,7 @@ function createTableWithWidth(myTableId, tableCols, tableRows, tableWidth) {
   x.style["width"] = tableWidth;
   document.body.appendChild(x);
 
-  var y
+  var y;
   for(y=0; y< tableRows; y++) {
 	  var newRow = document.createElement("TR");
 	  newRow.setAttribute("id", "myTr");
