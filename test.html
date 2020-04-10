@@ -1,15 +1,40 @@
 <!DOCTYPE HTML>
 <html>
 	<head>
-			<meta http-equiv="X-UA-Compatible" content="IE=EDGE"/>
-			<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-			<!-- Chrome browser will display response in the form of html page by using above line. -->
-			<link rel="stylesheet" href="../HelperFunctions/general.css">
-			<script type="text/javascript" src="../HelperFunctions/general.js"></script>
-			<script type="text/javascript" src="../HelperFunctions/tableFunctions.js"></script>
-			<script type="text/javascript" src="../HelperFunctions/headerFunction.js"></script>
-			<script type="text/javascript" src="../HelperFunctions/pseudocodeFunctions.js"></script>
-			<script type="text/javascript">
+		<meta http-equiv="X-UA-Compatible" content="IE=EDGE"/>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+		<!-- Chrome browser will display response in the form of html page by using above line. -->
+		<link rel="stylesheet" href="../HelperFunctions/general.css">
+		<script type="text/javascript" src="../HelperFunctions/general.js"></script>
+		<script type="text/javascript" src="../HelperFunctions/tableFunctions.js"></script>
+		<script type="text/javascript" src="../HelperFunctions/headerFunction.js"></script>
+		<script type="text/javascript" src="../HelperFunctions/pseudocodeFunctions.js"></script>
+		<style>
+			/* CSS space */
+			.labelCellFormat
+			{
+				font-size: 35px;
+				width: 70px;
+				height: 50px;
+				text-align: center;
+				border-style: solid;
+				border-width: 2px;
+				border-color: black;
+				background-color: #FFFFFF;
+			}
+			.InputCellFormat
+			{
+				font-size: 35px;
+				width: 70px;
+				height: 50px;
+				text-align: center;
+				border-style: solid;
+				border-width: 2px;
+				border-color: black;
+				background-color:#DEDEDE;
+			}
+		</style>
+		<script type="text/javascript">
 			var numElements = 5;
 			var myTableId = "myArray";
 			var myPseudoCodeArrayId = "myPseudocodeArray";
@@ -24,50 +49,60 @@
 			var currentMode = 0;
 			var initialji = 0;
 
-			function funNumElements(){
+			function funNumElements()
+			{
 				numElements = parseInt(document.getElementById("NumElements").value, 10);
 				createKTable();
 			}
-			//	function makeRandArray(){
-            //        var i;
-            //        var arr = [];
-			//		numElements = parseInt(document.getElementByID("NumElements").value, 10);
-			//		for(i = 0; i < numElements; i++)
-            //        {
-            //            arr[i] = (Math.round(Math.random()*100));
-						//document.getElementById("checker").innerHTML = arr[i];
-			//			setCell(myTableId, arr[i]; 1, 1);
-			//			setCellColor(MyTableId, arr[i], 0, "#F1B300";
-            //        }
-			//	}
-				function createKTable(){
-					 createTable(myTableId, numElements + 1, 2);
-					 setCell(myTableId, 0, 0, "i:");
-					 setCell(myTableId, 0, 1, "value:");
-					 //setCellColor(myTableId, 0, 1, "yellow");
-					 for(x = 0; x < numElements + 1; x++)
-					 {
-						//setCellAsInputBoxAndHighlight(myTableId, x, 0, "white", x - 1);
-						setCellColor(myTableId, x, 0, "#FFFFFF");
-						setCellBorder(myTableId, x, 0, "1px solid black");
-						if( x != 0)
-						{
-							setCell(myTableId, x, 0, x-1);
-						}
-					 }
-					 for(x = 0; x < numElements + 1; x++)
-					 {
-						setCellColor(myTableId, x, 1, "#DEDEDE");
-						setCellBorder(myTableId, x, 1, "1px solid black");
-						if( x != 0)
-						{
-							setCell(myTableId, x, 1, getRandomCount(25));
-						}
-					 }
-					
+			function createKTable()
+			{
+				createTable(myTableId, numElements + 1, 2);
+				setCell(myTableId, 0, 0, "i:");
+				setCell(myTableId, 0, 1, "value:");
+				setCellCSSClass(myTableId, 0, 1, "InputCellFormat");
+				for(x = 0; x < numElements + 1; x++)
+				{
+					if( x != 0)
+					{
+						setCell(myTableId, x, 0, x-1);
+					}
+					setCellCSSClass(myTableId, x, 0, "labelCellFormat");
 				}
+					for(x = 0; x < numElements + 1; x++)
+					{
+						if( x != 0)
+						{
+							setCellAsInputBox2(myTableId, x, 1, getRandomCount(25));
+						}
+					}	
+			}
+			//Sets cell as input box and applies CSS style
+			function setCellAsInputBox2(myTableId, x,y, initialValue) 
+			{
+  				var myTable = document.getElementById(myTableId); 
+  				var input = document.createElement("input");
+ 				input.type = "text";
+  				input.className = "InputCellFormat"; // set the CSS class
+  				input.value = initialValue;
+  				//input.style["width"] = "32px";
+  				//input.onchange = "inputBoxChanged("+x+","+y+")";
+  				input.onchange = function() {inputBoxChanged(myTableId, x, y)};
+  				var mycell = myTable.rows[y].cells[x];
+				if (mycell.hasChildNodes()) 
+				{
+     				mycell.removeChild(mycell.childNodes[0]);
+  				} 
+  				mycell.appendChild(input);  
+  				input.focus();  
+			}
+			function setCellCSSClass(myTableId, x, y, applyClass)
+			{
+				var myTable = document.getElementById(myTableId);
+				var mycell = myTable.rows[y].cells[x];
+				mycell.className = applyClass;
+			}
 
-			</script>
+		</script>
 	</head>
 	<body onload="welcome()">
 		<!--Header-->

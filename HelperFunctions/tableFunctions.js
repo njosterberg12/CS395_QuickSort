@@ -53,7 +53,7 @@ function setCellAsInputBox(myTableId, x,y, initialValue) {
   var myTable = document.getElementById(myTableId); 
   var input = document.createElement("input");
   input.type = "text";
-  input.className = "css-class-name"; // set the CSS class
+  input.className = "cell-css-class"; // set the CSS class
   input.value = initialValue;
   input.style["width"] = "32px";
   //input.onchange = "inputBoxChanged("+x+","+y+")";
