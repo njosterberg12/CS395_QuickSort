@@ -37,7 +37,7 @@
 		<script type="text/javascript">
 			var numElements = 5;
 			var myTableId = "myArray";
-			var myPseudoCodeArrayId = "myPseudocodeArray";
+			var myPseudocodeTableId = "myPseudocodeTable";
 			var currentNode = 0;
 			var currentX = 0;
 			var currentY = 0;
@@ -74,7 +74,13 @@
 						{
 							setCellAsInputBox2(myTableId, x, 1, getRandomCount(25));
 						}
-					}	
+					}
+				var low = 0; // first element in the array
+				var high = numElements - 1; // this is the last element in the array
+				createPsuedocodeTable(myPseudocodeTableId);
+				appendPseudocode(myPsuedocodeTableId, "hello");
+				quickSort(myTableId, low, high);
+
 			}
 			//Sets cell as input box and applies CSS style
 			function setCellAsInputBox2(myTableId, x,y, initialValue) 
@@ -100,6 +106,53 @@
 				var myTable = document.getElementById(myTableId);
 				var mycell = myTable.rows[y].cells[x];
 				mycell.className = applyClass;
+			}
+			function quickSort(myTableId, low, high)
+			{
+				appendPseudocode(myPseudocodeTableId, "quickSort()");
+				var myTable = document.getElementById(myTableId);
+				var index;
+				appendPseudocode(myPsuedocodeTableId, "if low < high");
+				if (low < high)
+				{
+					appendPseudocode(myPsuedocodeTableId, "index = lomutoPartition()");
+					index = lomutoPartition(myTable, low, high); // index determined by partition
+					quickSort(myTable, low, index - 1);
+					quickSort(myTable, index, high);
+				}
+				return myTable;
+			}
+			function lomutoPartition(myTableId, low, high)
+			{
+				var myTable = document.getElementById(myTableId);
+				var pivot = myTable[Math.floor((low + high)/ 2 )]; // finds middle element of myTable
+				var i = low; // left pointer
+				var j = high; // right pointer
+				while(i <= j)
+				{
+					while(myTable[i] < pivot)
+					{
+						i++;
+					}
+					while(myTable[j] < pivot)
+					{
+						j--;
+					}
+					if (i <= j)
+					{
+						swap(myTable, i, j); // swap elements in myTable
+						i++;
+						j--;
+					}
+				}
+				return i;
+			}
+			function swap(myTableId, low, high)
+			{
+				var myTable = document.getElementById(myTableId);
+				var temp = myTable[low];
+				myTable[low] = myTable[high];
+				myTable[high] = temp;
 			}
 
 		</script>
