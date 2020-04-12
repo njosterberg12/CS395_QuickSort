@@ -1,30 +1,108 @@
 <!DOCTYPE HTML>
 <html>
 	<head>
-			<meta http-equiv="X-UA-Compatible" content="IE=EDGE"/>
-			<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-			<!-- Chrome browser will display response in the form of html page by using above line. -->
-			<link rel="stylesheet" href="general.css">
-			<script type="text/javascript" src="../general.js"></script>
-			<script type="text/javascript" src="../tableFunctions.js"></script>
-			<script type="text/javascript" src="../headerFunction.js"></script>
-			<script type="text/javascript" src="../pseudocodeFunctions.js"></script>
-			<script type="text/javascript">
-            
-            var numElements = 1;
-				
-				function makeRandArray(){
-                    var i;
-                    var arr = [];
-					numElements = parseInt(document.getElementByID("NumElements").value, 10);
-					for(i = 0; i < numElements; i++)
-                    {
-                        arr[i] = (Math.round(Math.random()*100));
-                     //   document.getElementById("checker").innerHTML = arr[i];
-                    }
-				}
+		<meta http-equiv="X-UA-Compatible" content="IE=EDGE"/>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+		<!-- Chrome browser will display response in the form of html page by using above line. -->
+		<link rel="stylesheet" href="../HelperFunctions/general.css">
+		<script type="text/javascript" src="../HelperFunctions/general.js"></script>
+		<script type="text/javascript" src="../HelperFunctions/tableFunctions.js"></script>
+		<script type="text/javascript" src="../HelperFunctions/headerFunction.js"></script>
+		<script type="text/javascript" src="../HelperFunctions/pseudocodeFunctions.js"></script>
+		<style>
+			/* CSS space */
+			.labelCellFormat
+			{
+				font-size: 35px;
+				width: 70px;
+				height: 50px;
+				text-align: center;
+				border-style: solid;
+				border-width: 2px;
+				border-color: black;
+				background-color: #FFFFFF;
+			}
+			.InputCellFormat
+			{
+				font-size: 35px;
+				width: 70px;
+				height: 50px;
+				text-align: center;
+				border-style: solid;
+				border-width: 2px;
+				border-color: black;
+				background-color:#DEDEDE;
+			}
+		</style>
+		<script type="text/javascript">
+			var numElements = 5;
+			var myTableId = "myArray";
+			var myPseudoCodeArrayId = "myPseudocodeArray";
+			var currentNode = 0;
+			var currentX = 0;
+			var currentY = 0;
+			
+			var currentI = 0;
+			var currentJ = 0;
+			var currentK = 0;
 
-			</script>
+			var currentMode = 0;
+			var initialji = 0;
+
+			function funNumElements()
+			{
+				numElements = parseInt(document.getElementById("NumElements").value, 10);
+				createKTable();
+			}
+			function createKTable()
+			{
+				createTable(myTableId, numElements + 1, 2);
+				setCell(myTableId, 0, 0, "i:");
+				setCell(myTableId, 0, 1, "value:");
+				setCellCSSClass(myTableId, 0, 1, "InputCellFormat");
+				for(x = 0; x < numElements + 1; x++)
+				{
+					if( x != 0)
+					{
+						setCell(myTableId, x, 0, x-1);
+					}
+					setCellCSSClass(myTableId, x, 0, "labelCellFormat");
+				}
+					for(x = 0; x < numElements + 1; x++)
+					{
+						if( x != 0)
+						{
+							setCellAsInputBox2(myTableId, x, 1, getRandomCount(25));
+						}
+					}	
+			}
+			//Sets cell as input box and applies CSS style
+			function setCellAsInputBox2(myTableId, x,y, initialValue) 
+			{
+  				var myTable = document.getElementById(myTableId); 
+  				var input = document.createElement("input");
+ 				input.type = "text";
+  				input.className = "InputCellFormat"; // set the CSS class
+  				input.value = initialValue;
+  				//input.style["width"] = "32px";
+  				//input.onchange = "inputBoxChanged("+x+","+y+")";
+  				input.onchange = function() {inputBoxChanged(myTableId, x, y)};
+  				var mycell = myTable.rows[y].cells[x];
+				if (mycell.hasChildNodes()) 
+				{
+     				mycell.removeChild(mycell.childNodes[0]);
+  				} 
+  				mycell.appendChild(input);  
+  				input.focus();  
+			}
+			function setCellCSSClass(myTableId, x, y, applyClass)
+			{
+				var myTable = document.getElementById(myTableId);
+				var mycell = myTable.rows[y].cells[x];
+				mycell.className = applyClass;
+			}
+
+		</script>
 	</head>
 	<body onload="welcome()">
 		<!--Header-->
@@ -32,7 +110,7 @@
 			createHeader("Quick Sort");
 		</script>
 		<p>
-			Do a quickSort of the values in ascending order. For information about quicksort, click <a target=\"_blank\" href=\"https://en.wikipedia.org/wiki/Quicksort"> here</a>. 
+			Do a quickSort of the values in ascending order. For information about quicksort, click <a target=\"_blank\" href="https://en.wikipedia.org/wiki/Quicksort"> here</a>. 
 		</p>
 		<p>
 			Input the appropriate number in the slot as to how a quickSort would sort the data.
@@ -40,7 +118,7 @@
 		<script>
 			//welcome();
 		</script>
-		How many elements do you want to choose from?:
+		How many elements do you want to sort?:
 		<select style="width:80px" id="NumElements" name="NumElements">
 			<option>5</option>
 			<option>6</option>
@@ -51,7 +129,7 @@
 		</select>
 	
 		<script>
-			document.getElementById("NumElements").onchange = function() {makeRandArray()};
+			document.getElementById("NumElements").onchange = function() {funNumElements()};
 		</script>
 		
 		<BR>

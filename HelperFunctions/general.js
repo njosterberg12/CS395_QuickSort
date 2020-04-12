@@ -1,4 +1,3 @@
-
 var mute = false;
 
 var lastUtterance = "";
