@@ -59,10 +59,12 @@
 			}
 		</style>
 		<script type="text/javascript">
-			var numElements = 5;
+			var numElements;
 			var myTableId = "myArray";
-			var myPseudocodeTableId = "myPseudocodeTable";
-			var myLabelTableId = "myLabelTableId"; // used to label index i and value of array table
+			var myPseudocodeParentTableId = "myPseudocodeParentTable";
+			var myQuicksortPseudocodeTableId = "myQuicksortPseudocodeTable";
+			var myHoaresPseudocodeTableId = "myHoaresPseudocodeTable";
+			var myLabelTableId = "myLabelTable"; // used to label index i and value of array table
 			var currentNode = 0;
 			var currentX = 0;
 			var currentY = 0;
@@ -103,9 +105,13 @@
 				{
 					setCellCSSClass(myTableId, x, 2, "markerCellFormat");
 				}
-				var low = 0; // first element in the array
+				var low = 0; // first element in the array"
 				var high = numElements - 1; // this is the last element in the array
-				createPseudocodeTable(myPseudocodeTableId);
+				/*createTable(myPseudocodeParentTableId, 2, 1);
+				createPseudocodeTable(myQuicksortPseudocodeTableId);
+				createPseudocodeTable(myHoaresPseudocodeTableId);
+				setPseudocodeParentCell(myPseudocodeParentTableId, 0, 0, myQuicksortPseudocodeTableId);
+				setPseudocodeParentCell(myPseudocodeParentTableId, 1, 0, myHoaresPseudocodeTableId);*/
 				console.clear();
 				console.log("Before - ");
 				printArrayTable(myTableId, numElements);
@@ -113,6 +119,17 @@
 				console.log("After - ");
 				printArrayTable(myTableId, numElements);
 
+			}
+			function setPseudocodeParentCell(myPseudocodeParentTableId, x, y, myPseudocodeSubTableId)
+			{
+				var myPseudocodeParentTable = document.getElementById(myPseudocodeParentTableId);
+				var myPseudocodeSubTable = document.getElementById(myPseudocodeSubTableId);
+				var parentCell = myPseudocodeParentTable.rows[y].cells[x];
+				if(parentCell.hasChildNodes())
+				{
+					parentCell.removeChild(parentCell.childNodes[0]);
+				}
+				parentCell.appendChild(myPseudocodeSubTable);
 			}
 			//Sets cell as input box and applies CSS Class
 			function setCellAsInputBox2(myTableId, x,y, initialValue) 
@@ -153,11 +170,11 @@
 				}
 				console.log("Array: " + ar.join(' '));
 			}
-			function quickSort(myTableId, low, high)
+/*		function quickSort(myTableId, low, high)
 			{
 				appendPseudocode(myPseudocodeTableId, "quickSort()");
 				appendPseudocode(myPseudocodeTableId, "if low < high");
-				if (low < high)
+				if (high > low)
 				{
 					console.log("quickSort() low: " + low + " high: " + high);
 					printArrayTable(myTableId, numElements);
@@ -168,7 +185,50 @@
 				}
 				return;
 			}
-			function lomutoPartition(myTableId, low, high)
+*/			
+			function quickSort(myTableId, low, high)
+			{
+				//appendPseudocode(myPseudocodeTableId, "quickSort()");
+				//appendPseudocode(myPseudocodeTableId, "if low >= high");
+				
+				if(low < high)
+				{
+					console.log("quickSort() //low=%d; high=%d",low, high);
+					printArrayTable(myTableId, numElements);
+					var split = hoarePartition(myTableId, low, high);
+					quickSort(myTableId, low, split);
+					quickSort(myTableId, split + 1, high);
+				}
+			}
+			function hoarePartition(myTableId, low, high)
+			{
+				console.log("partition() //low=%d; high=%d", low, high);
+				var pivot = parseInt(getInputCellValue(myTableId, low, 1), 10); // pivot is shifted to the right as the values below low val are ordered
+				console.log("pivot val: ", pivot);
+				var i = low;
+				var j = high;
+				while(i < j)
+				{
+					while ((parseInt(getInputCellValue(myTableId, i, 1), 10) <= pivot) && (i < high))
+					{
+						i++;
+						console.log("i: %d", i);
+					}
+					while (parseInt(getInputCellValue(myTableId, j, 1), 10) >= pivot && j > low)
+					{
+						j--;
+						console.log("j: %d", j);
+					}
+					if(i < j)
+					{
+						swap(myTableId, i, j);
+					}
+				}
+				swap(myTableId, low, j);
+				return j;
+
+			}
+/*			function lomutoPartition(myTableId, low, high)
 			{
 				var pivot = parseInt(getInputCellValue(myTableId, high, 1), 10); //selects element at end of array for pivot
 				console.log("pivot value: ", pivot);
@@ -186,7 +246,7 @@
 				}
 				swap(myTableId, i, high);
 				return i;
-			}
+			} */
 			function swap(myTableId, i, j)
 			{
 				var temp = getInputCellValue(myTableId, i, 1);
@@ -198,7 +258,7 @@
 				//sayIt("QuickSort");
 			}
 			async function delay(delayInms) {
-      	return new Promise(resolve  => {
+      			return new Promise(resolve  => {
         		setTimeout(() => {
           		resolve(2);
         			}, delayInms);
@@ -216,22 +276,22 @@
 			QuickSort(A, low, high)<br />
 			//Input: Array, Left index, Right index<br/>
 			&emsp;if low &lt; high then<br />
-			&emsp;&emsp;pivot := partition(A, low, high)<br />
+			&emsp;&emsp;split := partition(A, low, high)<br />
 			&emsp;&emsp;quicksort(A, low, pivot - 1)<br />
 			&emsp;&emsp;quicksort(A, pivot + 1, high)<br />
 			<br />
-			LomutoPartition(A, low, high)<br />
-			&emsp;pivot := A[high]<BR>
+			HoarePartition(A, low, high)<br />
+			&emsp;pivot := A[low]<BR>
 			&emsp;i := low<br />
-			&emsp;for j := low to high do<br />
-			&emsp;&emsp;if A[j] &lt; pivot then<br />
-			&emsp;&emsp;&emsp;swap A[i] with A[j]<br />
+			&emsp;j := high + 1<br />
+			&emsp;do<br />&lt
+			&emsp;&emsp;do i<br />
 			&emsp;&emsp;&emsp;i := i + 1<br />
 			&emsp;swap A[i] with A[high]<br />
 			&emsp;return i<br />
 		</div>	
 		<p>
-			Do a quickSort of the values in ascending order. For information about quicksort, click <a target=\"_blank\" href="https://en.wikipedia.org/wiki/Quicksort"> here</a>.
+			Perform a quicksort of the values in ascending order. For information about quicksort, click <a target=\"_blank\" href="https://en.wikipedia.org/wiki/Quicksort"> here</a>.
 			<br />
 			Input the appropriate number in the slot as to how a quickSort would sort the data.
 			<br />
