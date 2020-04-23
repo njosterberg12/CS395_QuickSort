@@ -1,0 +1,41 @@
+input {
+  width: 5%;
+  margin: 1%;
+}
+
+.highlighted {
+  border: 1px solid blueviolet;
+  background-color: cyan;
+}
+
+.pivot {
+  border: 1px solid red;
+  background-color: orange;
+}
+
+.unhighlighted {
+  border: none;
+  background-color:  #191919; 
+}
+
+.finished {
+  border: 1px solid green;
+}
+
+.testing {
+  border: 1px solid orange;
+  background-color: yellow; 
+}
+
+body {
+  background-color: #FFFFFF
+}
+
+h1 {
+  color: #FFFFFF;
+  text-align: center;
+}
+
+p {
+  color: #191919;
+} 

@@ -61,9 +61,8 @@
 		<script type="text/javascript">
 			var numElements;
 			var myTableId = "myArray";
-			var myPseudocodeParentTableId = "myPseudocodeParentTable";
-			var myQuicksortPseudocodeTableId = "myQuicksortPseudocodeTable";
-			var myHoaresPseudocodeTableId = "myHoaresPseudocodeTable";
+			var myPseudocodeTableId = "myPseudocodeTable";
+
 			var myLabelTableId = "myLabelTable"; // used to label index i and value of array table
 			var currentNode = 0;
 			var currentX = 0;
@@ -75,6 +74,9 @@
 
 			var currentMode = 0;
 			var initialji = 0;
+			var arr;
+			var started = false;
+			var state;
 
 			function funNumElements()
 			{
@@ -107,29 +109,17 @@
 				}
 				var low = 0; // first element in the array"
 				var high = numElements - 1; // this is the last element in the array
-				/*createTable(myPseudocodeParentTableId, 2, 1);
-				createPseudocodeTable(myQuicksortPseudocodeTableId);
-				createPseudocodeTable(myHoaresPseudocodeTableId);
-				setPseudocodeParentCell(myPseudocodeParentTableId, 0, 0, myQuicksortPseudocodeTableId);
-				setPseudocodeParentCell(myPseudocodeParentTableId, 1, 0, myHoaresPseudocodeTableId);*/
+				//Put table cells into array for easy access
+   			arr = document.getElementsByClassName("InputCellFormat");
+				createPseudocodeTable(myPseudocodeTableId);
+
 				console.clear();
 				console.log("Before - ");
-				printArrayTable(myTableId, numElements);
-				quickSort(myTableId, low, high);
+				printArray();
+				//quickSort(myTableId, low, high);
 				console.log("After - ");
-				printArrayTable(myTableId, numElements);
+				printArray();
 
-			}
-			function setPseudocodeParentCell(myPseudocodeParentTableId, x, y, myPseudocodeSubTableId)
-			{
-				var myPseudocodeParentTable = document.getElementById(myPseudocodeParentTableId);
-				var myPseudocodeSubTable = document.getElementById(myPseudocodeSubTableId);
-				var parentCell = myPseudocodeParentTable.rows[y].cells[x];
-				if(parentCell.hasChildNodes())
-				{
-					parentCell.removeChild(parentCell.childNodes[0]);
-				}
-				parentCell.appendChild(myPseudocodeSubTable);
 			}
 			//Sets cell as input box and applies CSS Class
 			function setCellAsInputBox2(myTableId, x,y, initialValue) 
@@ -161,12 +151,12 @@
 				var myTable = document.getElementById(myTableId);
 				myTable.className = applyClass;
 			}
-			function printArrayTable(myTableId, numElements)
+			function printArray()
 			{
 				var ar=[];
 				for(i = 0; i < numElements; i++)
 				{
-					ar.push(getInputCellValue(myTableId, i, 1));
+					ar.push(arr[i].value);
 				}
 				console.log("Array: " + ar.join(' '));
 			}
@@ -186,6 +176,23 @@
 				return;
 			}
 */			
+			function step(state)
+			{
+				if(!started)
+				{
+					if(state != 3)
+						return;
+					started = true;
+					for(i = 0; i < numElements; i++)
+					{
+						arr[i].disabled = true;
+					}
+					low = 0;
+					high = numElements - 1;
+					pivot = Number(arr[low].value);
+
+				}	
+			}
 			function quickSort(myTableId, low, high)
 			{
 				//appendPseudocode(myPseudocodeTableId, "quickSort()");
@@ -194,7 +201,7 @@
 				if(low < high)
 				{
 					console.log("quickSort() //low=%d; high=%d",low, high);
-					printArrayTable(myTableId, numElements);
+					printArray();
 					var split = hoarePartition(myTableId, low, high);
 					quickSort(myTableId, low, split);
 					quickSort(myTableId, split + 1, high);
@@ -203,28 +210,28 @@
 			function hoarePartition(myTableId, low, high)
 			{
 				console.log("partition() //low=%d; high=%d", low, high);
-				var pivot = parseInt(getInputCellValue(myTableId, low, 1), 10); // pivot is shifted to the right as the values below low val are ordered
+				var pivot = Number(arr[low].value); // pivot is shifted to the right as the values below low val are ordered
 				console.log("pivot val: ", pivot);
 				var i = low;
 				var j = high;
 				while(i < j)
 				{
-					while ((parseInt(getInputCellValue(myTableId, i, 1), 10) <= pivot) && (i < high))
+					while (arr[i].value <= pivot && (i < high))
 					{
 						i++;
 						console.log("i: %d", i);
 					}
-					while (parseInt(getInputCellValue(myTableId, j, 1), 10) >= pivot && j > low)
+					while (arr[j].value >= pivot && j > low)
 					{
 						j--;
 						console.log("j: %d", j);
 					}
 					if(i < j)
 					{
-						swap(myTableId, i, j);
+						swap(arr[i], arr[j]);
 					}
 				}
-				swap(myTableId, low, j);
+				swap(arr[low], arr[j]);
 				return j;
 
 			}
@@ -247,11 +254,13 @@
 				swap(myTableId, i, high);
 				return i;
 			} */
-			function swap(myTableId, i, j)
+			function swap(a, b)
 			{
-				var temp = getInputCellValue(myTableId, i, 1);
-				setInputCell(myTableId, i, 1, getInputCellValue(myTableId, j, 1));
-				setInputCell(myTableId, j, 1, temp);
+   			//a.setAttribute("class", "highlighted");
+   			//b.setAttribute("class", "highlighted");
+   			var temp = a.value;
+   			a.value = b.value;
+   			b.value = temp;
 			}
 			function welcome()
 			{
@@ -310,7 +319,8 @@
 		<script>
 			document.getElementById("NumElements").onchange = function() {funNumElements()};
 		</script>
-		<input style="visibility:visible;" type="button" id="ButtonShowMe" value="ShowMe" onclick="(nextStep())" enabled>
+		<input style="visibility:visible;" type="button" id="ButtonContinue" value="Continue" onclick="step(3)" enabled>
+		<input style="visibility:hidden;" type="button" id="ButtonShowMe" value="ShowMe" onclick="nextStep()" enabled>
 		<input style="visibility:hidden;" type="button" id="ButtonYes" value="Yes" onclick="choseYes()" disabled>
 		<input style="visibility:hidden;" type="button" id="ButtonNo"value="No" onclick="choseNo()" disabled>
 		<BR>

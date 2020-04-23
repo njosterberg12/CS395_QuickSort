@@ -1,0 +1,159 @@
+<!doctype html>
+<html>
+	<head>
+		<meta http-equiv="X-UA-Compatible" content="IE=EDGE"/>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+		<!--Chrome browser will display response in the form of html page by using above line. -->
+		<link rel="stylesheet" href="HelperFunctions/lomuto.css">
+		
+		<script type="text/javascript" src="../HelperFunctions/general.js"></script>
+		<script type="text/javascript" src="../HelperFunctions/tableFunctions.js"></script>
+		<script type="text/javascript" src="../HelperFunctions/headerFunction.js"></script>
+		<script type="text/javascript" src="../HelperFunctions/pseudocodeFunctions.js"></script>
+		
+		<script type="text/javascript">
+var started = false;
+var arr;
+var pivot;
+var pivotVal;
+var lo, hi;
+var tmp;
+var j;
+var checked = false;
+var state = 0; // 0 waiting for continue, 1 pivot testing waiting for swap or don't swap
+var PSID = "myPseudocodeTable";
+
+function welcome() {
+   sayIt(document.getElementById("desc").innerText);
+   arr = document.getElementsByName("cell");
+   for(var i = 0; i < arr.length; i++) {
+      arr[i].value = getRandomInt(99);
+   }
+   createPseudocodeTable(PSID);
+}
+
+function clear() {
+   for(var i = 1; i < arr.length; i++) {
+      arr[i].setAttribute("class", "unhighlighed");
+   }
+}
+
+function step(swapVar){
+   if(!started) {
+	  if(swapVar!==3) return;
+      started = true;
+      for(var i = 0; i < arr.length; i++) {
+         arr[i].disabled = true;
+      }
+      lo = 0;
+      hi = arr.length; // - 1;
+      pivot = arr[lo];
+	  arr[lo].setAttribute("class", "pivot");
+      pivotVal = Number(pivot.value);
+      //pivot.setAttribute("class", "pivot");
+      appendPseudocode(PSID, "Select the first element, "+ pivot.value +" as the pivot.");
+      tmp = lo + 1;
+      j = lo + 1;
+	  state=0;
+	  hideElement("ButtonContinue");
+	  showElement("ButtonSwap", "Swap");
+	  showElement("ButtonDont", "Don't Swap");
+	  step(3);
+   } else {
+	   
+	  if( state===1){
+		if( swapVar === 0 && checked){
+			appendPseudocode(PSID, "You should swap because " + arr[j].value + "<=" + pivotVal );
+			return;
+		}else if(swapVar === 1 && !checked){
+			appendPseudocode(PSID, "You should NOT swap because " + arr[j-1].value + ">" + pivotVal);
+			return;
+		}else if(swapVar === 3) return;
+	  }else if(state === 0 && swapVar !== 3) return;
+	  
+      clear();
+      lomuto();
+   }
+   if(swapVar!==3)
+      step(3);
+}
+
+function swap(a, b) {
+   a.setAttribute("class", "highlighted");
+   b.setAttribute("class", "highlighted");
+   var val = a.value;
+   a.value = b.value;
+   b.value = val;
+   appendPseudocode(PSID, "Swap " + a.value + " and " + b.value);
+   state=0;
+}
+
+function lomuto() {
+   if(checked) {
+      checked = false;
+      swap(arr[tmp], arr[j]);
+      tmp++;
+      j++;
+   } else {
+	  arr[tmp].setAttribute("class", "highlighted");
+      if(j < hi) {
+         appendPseudocode(PSID, "Test "+ arr[j].value +" against the pivot (Swap or don't swap)");
+		 state=1;
+         arr[j].setAttribute("class", "testing");
+         if(Number(arr[j].value) <= pivotVal) {
+            checked = true;
+         } else {
+            j++;
+         }
+      } else if(j === hi) {
+		 appendPseudocode(PSID,"One final swap to put the pivot in the correct place");
+         swap(arr[tmp-1], arr[lo]);
+         j++;
+		 showElement("ButtonContinue", "Continue");
+		 hideElement("ButtonSwap");
+		 hideElement("ButtonDont");
+         for(var i = 0; i < arr.length; i++) {
+            arr[i].setAttribute("class", "finished");
+         }
+         arr[tmp-1].setAttribute("class", "pivot");		 
+      }else {
+         appendPseudocode(PSID,"Finished!");
+         for(var i = 0; i < arr.length; i++) {
+            arr[i].setAttribute("class", "finished");
+         }
+         arr[tmp-1].setAttribute("class", "pivot");
+      }
+   }
+}		
+		
+</script>		
+		
+	</head>
+<body onload="welcome()">
+	<!--Header -->
+	<script>createHeader("Lomuto Partitioning");</script>
+	<p id="desc">Lomuto partitioning is a method of partitioning an array that uses the last value as the "pivot". All values less than or equal to the pivot will be left of it and all values greater than the pivot will be right of it in the partitioned array.</p>
+	<p id="instructions">Enter the values of the starting array:</p>
+	<div>
+		<input name="cell" type="number" min="0" max="99">
+		<input name="cell" type="number" min="0" max="99">
+		<input name="cell" type="number" min="0" max="99">
+		<input name="cell" type="number" min="0" max="99">
+		<input name="cell" type="number" min="0" max="99">
+		<input name="cell" type="number" min="0" max="99">
+		<input name="cell" type="number" min="0" max="99">
+		<input name="cell" type="number" min="0" max="99">
+		<input name="cell" type="number" min="0" max="99">
+		<input name="cell" type="number" min="0" max="99">
+	</div>
+	<button id="ButtonContinue" onclick="step(3)">Continue</button>
+	<button id="ButtonSwap" style="visibility:hidden;" onclick="step(1)">Swap</button>
+	<button id="ButtonDont" style="visibility:hidden;" onclick="step(0)">Don't Swap</button>
+
+	<script>document.getElementById("KCapacity").onchange = function(){funKCapacity()};</script>
+		<br>
+		<input style="visibility:hidden;" type="button" id="ButtonShowMe" value="ShowMe" onclick="nextStep()" disabled>
+		<input style="visibility:hidden;" type="button" id="ButtonYes" value="Yes" onclick="choseYes()" disabled>
+		<input style="visibility:hidden;" type="button" id="ButtonNo"value="No" onclick="choseNo()" disabled>
+	</body>
+</html>
