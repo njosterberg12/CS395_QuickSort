@@ -1,0 +1,507 @@
+<!--
+	Connor Williams
+	Nathan Osterberg
+	Chris Van Essen
+	
+	This program implements a walkthrough of the Hoare's partitioning algorithm
+-->
+<!DOCTYPE HTML>
+<html>
+	<head>
+		<meta http-equiv="X-UA-Compatible" content="IE=EDGE"/>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+		<!-- Chrome browser will display response in the form of html page by using above line. -->
+		<link rel="stylesheet" href="../HelperFunctions/general.css">
+		<script type="text/javascript" src="../HelperFunctions/general.js"></script>
+		<script type="text/javascript" src="../HelperFunctions/tableFunctions.js"></script>
+		<script type="text/javascript" src="../HelperFunctions/headerFunction.js"></script>
+		<script type="text/javascript" src="../HelperFunctions/pseudocodeFunctions.js"></script>
+		<style>
+			/* CSS space */
+			.labelCellFormat
+			{
+				font-size: 35px;
+				height: 50px;
+				width: 40px;
+				text-align: center;
+				border-style: solid;
+				border-width: 2px;
+				border-color: black;
+				background-color: #FFFFFF;
+			}
+			.arrayCellFormat
+			{
+				font-size: 35px;
+				height: 50px;
+				width: 40px;
+				text-align: center;
+				padding-right: 10px;
+				padding-left: 10px;
+				border-style: solid;
+				border-width: 2px;
+				border-color: black;
+				background-color:#39DB77;
+			}
+			.markerCellFormat
+			{
+				font-size: 25px;
+				height: 50px;
+				width: 40px;
+				text-align: center;
+				border-style: solid;
+				border-width: 0px;
+				background-color: #FFFFFF;
+			}
+			.iBox
+			{
+				font-size: 15px;
+				height: 50px;
+				width: 40px;
+				text-align: center;
+				border-style: solid;
+				border-width: 0px;
+				background-color: #FFFFFF;
+			}
+			.jBox
+			{
+				font-size: 15px;
+				height: 50px;
+				width: 50px;
+				text-align: center;
+				border-style: solid;
+				border-width: 0px;
+				background-color: #FFFFFF;
+			}
+			.arrayTableFormat
+			{
+				display: inline-block;
+				padding: 5px;
+				vertical-align: top;
+			}
+			.boxed
+			{
+				box-sizing: content-box;  
+				padding: 15px;
+				margin-top: 8px; 
+				border: 10px;
+				border-style: ridge;
+  				border-color: rgb(55, 63, 58)
+			}
+			.highlighted {
+				font-size: 35px;
+				height: 50px;
+				width: 40px;
+				padding-right: 10px;
+				padding-left: 10px;
+				text-align: center;
+				border-style: solid;
+				border-color: black;
+  				background-color: cyan;
+			}
+		</style>
+		<script type="text/javascript">
+			var numElements;
+			var myTableId = "myArray";
+			var myPseudocodeTableId = "myPseudocodeTable";
+			var myLabelTableId = "myLabelTable"; // used to label index i and value of array table
+			var currentNode = 0;
+			var currentX = 0;
+			var currentY = 0;
+			
+			var currentI = 0;
+			var currentJ = 0;
+			var currentK = 0;
+
+			var currentMode = 0;
+			var initialji = 0;
+			var arr;
+			var high;
+			var low;
+			var i;
+			var j;
+			var ilessthanj = true;
+			var started = false;
+			var state;
+			var checkedi = false;
+			var checkedj = false;
+			var checkedLow = false;
+			
+			//var low; 
+			//var high;
+			//var pivot;
+
+			function funNumElements()
+			{
+
+				numElements = parseInt(document.getElementById("NumElements").value, 10);
+
+				//if(numElements == NULL)
+				//{
+				//	hideElement("ButtonStart");
+				//}
+				createArrayTable();
+			}
+			function createArrayTable()
+			{
+				createTable(myLabelTableId, 1, 2);
+				createTable(myTableId, numElements, 3);
+				setTableCSSClass(myLabelTableId, "arrayTableFormat");
+				setTableCSSClass(myTableId, "arrayTableFormat");
+				setCell(myLabelTableId, 0, 0, "index:");
+				setCell(myLabelTableId, 0, 1, "value:");
+				setCellCSSClass(myLabelTableId, 0, 0, "labelCellFormat");
+				setCellCSSClass(myLabelTableId, 0, 1, "labelCellFormat");
+				for(x = 0; x < numElements; x++)
+				{
+					setCell(myTableId, x, 0, x);
+					setCellCSSClass(myTableId, x, 0, "labelCellFormat");
+				}
+
+				for(x = 0; x < numElements; x++)
+				{
+					setCellAsInputBox2(myTableId, x, 1, getRandomCount(99));
+					//setCellCSSClass(myTableId, x, 1, "arrayCellFormat")
+				}
+				for(x = 0; x < numElements-2; x++)
+				{
+					setCellCSSClass(myTableId, x, 2, "markerCellFormat");
+				}
+				setCellAsInputBox2(myTableId, numElements-2, 2, "");
+				setCellAsInputBox2(myTableId, numElements-1, 2, "");
+				setCellCSSClass(myTableId, numElements-2, 2, "iBox");
+				setCellCSSClass(myTableId, numElements-1, 2, "jBox");
+				setInputCellColor(myTableId, numElements-2, 2, "#FEFEA6");
+				setInputCellColor(myTableId, numElements-1, 2, "rgb(226, 166, 254)");
+				setPlaceholder(myTableId, numElements-2, 2, "[i]");
+				setPlaceholder(myTableId, numElements-1, 2, "[j]");
+				setInputCellColor(myTableId, 0, 1, "yellow");
+				
+				//Put table cells into array for easy access
+   				arr = document.getElementsByClassName("arrayCellFormat");
+				createPseudocodeTable(myPseudocodeTableId);
+				started = false;
+				showElement("ButtonStart", "Start");
+				hideElement("ButtonSwap");
+				//showElement("ButtonSwap", "Swap");
+				hideElement("ButtonContinue");
+
+				console.clear();
+				console.log("Before - ");
+				printArray();
+				//quickSort(low, high);
+				//console.log("After - ");
+				//printArray();
+
+			}
+			function nextStep(swapVar)
+			{
+				console.log("nextStep()" + swapVar);
+				if(!started)
+				{
+					if(swapVar !== 3)
+						return;
+					started = true;
+					showElement("ButtonSwap");
+					hideElement("ButtonStart");
+					showElement("ButtonContinue");
+					for(var x = 0; x < numElements; x++)
+					{
+						arr[x].disabled = true;
+					}
+					//pivot = parseInt(getCellValue(myTableId, 0, 1));
+					low = 0; // first element in the array"
+					high = numElements - 1; // this is the last element in the array
+					pivot = arr[0].value;
+					i = 0;
+					j = high;
+					appendPseudocode(myPseudocodeTableId ,"Set first element as pivot. Pivot = " + pivot);
+					
+					ilessthanj = true;
+					//pivot = arr[0];
+
+					console.log("pivot val:", pivot);
+					state = 0;
+					nextStep(3);
+				}
+				else
+				{
+					if(state===1)
+					{
+						if(swapVar === 1 && checkedi)
+						{
+							console.log("iVal: ", i);
+							console.log("arr[i]: ", arr[i].value);
+							if(parseInt(getInputCellValue(myTableId, numElements-2, 2)) != i)
+							{
+								appendPseudocode(myPseudocodeTableId, "Incorrect i value. Find the next (i) index value where A[ i ] > " + pivot);
+								return;
+							}
+						}
+						if(swapVar === 1 && checkedj)
+						{
+							console.log("jVal: ", j);
+							console.log("arr[j]: ", arr[j].value);
+							if(parseInt(getInputCellValue(myTableId, numElements-1, 2)) != j)
+							{
+								appendPseudocode(myPseudocodeTableId, "Incorrect j value. Find the next (j) index value where A[ j ] < " + pivot);
+								return;
+							}
+						}
+						if(swapVar===3)
+						{
+							//return;
+						}
+					}
+					else if(state === 0 && swapVar !== 3)
+					{
+						return;
+					}
+					//clear();
+					hoare();
+				}
+				if(swapVar!==3)
+				{
+					nextStep(3);
+				}
+				
+			}
+			function hoare()
+			{
+				
+				if(checkedi && checkedj && ilessthanj)
+				{
+					checkedi = false;
+					checkedj = false;
+					printArray();
+					appendPseudocode(myPseudocodeTableId, "Swapping A["+i+"] and A["+j+"]");
+					console.log("Swap A["+i+"] with A["+j+"]"); // i = " + i + " j = " + j);
+					swap(arr[i], arr[j]);
+					printArray();
+				}
+				else if(checkedi && checkedj && !ilessthanj)
+				{
+					console.log("i val: ", i, ", j val: ", j);
+					console.log("i is not < j, swap A[low] and A[j]");
+					appendPseudocode(myPseudocodeTableId, arr[i].value +" is NOT < "+arr[j].value+ " swap A[low] and A[j]");
+					checkedi = false;
+					checkedj = false;
+					setInputCellColor(myTableId, 0, 1, "#39DB77");
+					setInputCellColor(myTableId, j, 1, "yellow");
+					printArray();
+					console.log("Swap A[low] with A[j] // low = " + low + " j = " + j);
+					swap(arr[low], arr[j]);
+					printArray();
+					hideElement("ButtonSwap");
+					hideElement("ButtonStart");
+				}
+				else if(i < j)
+				{
+					console.log("i val: ", i, ", j val: ", j);
+					state = 1;
+					appendPseudocode(myPseudocodeTableId, "Increment i while A[i] <= pivot && i < high");
+					appendPseudocode(myPseudocodeTableId, "*Enter (i) index value in the box*");
+					appendPseudocode(myPseudocodeTableId, "Decrement j while A[j] <= pivot && j > low");
+					appendPseudocode(myPseudocodeTableId, "*Enter (j) index value in the box*");
+					appendPseudocode(myPseudocodeTableId, "*Press Swap button when you have picked the swap values*");
+					appendPseudocode(myPseudocodeTableId, "-------------------------------------------");
+					while((arr[i].value <= pivot) && (i < high))
+					{
+						console.log("i++");
+						i++;
+					}
+					checkedi = true;
+					while((arr[j].value >= pivot) && (j > low))
+					{
+						console.log("j--");
+						j--;
+					}
+					checkedj = true;
+					if(!(i < j))
+					{
+						console.log("ilessthanj = false");
+						ilessthanj = false;
+					}
+					console.log("i val: ", i, ", j val: ", j);
+				}
+				else
+				{
+					console.log("i val: " + i + ", j val: " + j);
+					appendPseudocode(myPseudocodeTableId, "Finished");
+					console.log("Finished");
+				}
+			}
+			
+			//Sets cell as input box and applies CSS Class
+			function setCellAsInputBox2(myTableId, x,y, initialValue) 
+			{
+  				var myTable = document.getElementById(myTableId); 
+  				var input = document.createElement("input");
+ 				input.type = "text";
+  				input.className = "arrayCellFormat"; // set the CSS class
+  				input.value = initialValue;
+  				//input.style["width"] = "32px";
+  				//input.onchange = "inputBoxChanged("+x+","+y+")";
+  				//input.onchange = function() {inputBoxChanged(myTableId, x, y)};
+  				var mycell = myTable.rows[y].cells[x];
+				if (mycell.hasChildNodes()) 
+				{
+     				mycell.removeChild(mycell.childNodes[0]);
+  				} 
+  				mycell.appendChild(input);  
+  				input.focus();  
+			}
+			function setPlaceholder(myTableId, x, y, placeholderText)
+			{
+				var myTable = document.getElementById(myTableId);
+				var mycell = myTable.rows[y].cells[x];
+				mycell.childNodes[0].placeholder = placeholderText;
+			}
+			function setCellCSSClass(myTableId, x, y, applyClass)
+			{
+				var myTable = document.getElementById(myTableId);
+				var mycell = myTable.rows[y].cells[x];
+				mycell.className = applyClass;
+			}
+			function setTableCSSClass(myTableId, applyClass)
+			{
+				var myTable = document.getElementById(myTableId);
+				myTable.className = applyClass;
+			}
+			function printArray()
+			{
+				var ar=[];
+				for(var c = 0; c < numElements; c++)
+				{
+					ar.push(Number(arr[c].value));
+				}
+				console.log("Array: " + ar.join(' '));
+			}
+			function quickSort(low, high)
+			{
+				//appendPseudocode(myPseudocodeTableId, "quickSort()");
+				//appendPseudocode(myPseudocodeTableId, "if low >= high");
+				
+				if(low < high)
+				{
+					console.log("quickSort() //low=%d; high=%d",low, high);
+					printArray();
+					clear();
+					var split = hoarePartition(low, high);
+					console.log("var split = ", split);
+					quickSort(low, split-1);
+					quickSort(split + 1, high);
+				}
+			}
+			function hoarePartition(low, high)
+			{
+				console.log("partition() //low=%d; high=%d", low, high);
+				var pivot = Number(arr[low].value); // pivot is shifted to the right as the values below low val are ordered
+				console.log("pivot val: ", pivot);
+				var i = low;
+				var j = high;
+				while(true)
+				{
+					while (arr[i].value <= pivot && (i < high))
+					{
+						i++;
+						console.log("i: %d", i);
+					}
+					while (arr[j].value >= pivot && (j > low))
+					{
+						j--;
+						console.log("j: %d", j);
+					}
+					if(i < j)
+					{
+						swap(arr[i], arr[j]);
+					}
+					else
+					{
+						swap(arr[low], arr[j]);
+						return j;
+					}
+				}
+			}
+			function swap(a, b)
+			{
+   			//a.setAttribute("class", "highlighted");
+   			//b.setAttribute("class", "highlighted");
+   			var temp = a.value;
+   			a.value = b.value;
+   			b.value = temp;
+			}
+			function welcome()
+			{
+				sayIt("QuickSort");
+			}
+			async function delay(delayInms) 
+			{
+      			return new Promise(resolve  => {
+        		setTimeout(() => {
+          		resolve(2);
+        			}, delayInms);
+      			});
+			}
+			function clear()
+			{
+				for(var index = 0; index < numElements; index++)
+				{
+					arr[index].setAttribute("class", "arrayCellFormat");
+					setInputCellColor(myTableId, index, 1, "#DEDEDE");
+
+				}
+			}
+		</script>
+	</head>
+	<body>
+		<!--Header-->
+		<script>
+			createHeader("Hoare Partition");
+		</script>
+			<div class="boxed" style="float:right;">
+			<u>Algorithm Pseudocode:</u><br />
+			HoarePartition(A, low, high)<br />
+			&emsp;pivot := A[low]<BR>
+			&emsp;i := low<br />
+			&emsp;j := high<br />
+			&emsp;repeat forever<br />
+			&emsp;&emsp;while A[i]&lt=pivot && i&lthigh<br />
+			&emsp;&emsp;&emsp;i++<br />
+			&emsp;&emsp;while A[j]&gt;=pivot && j > low<br />
+			&emsp;&emsp;&emsp;j--;<br />
+			&emsp;&emsp;if i &lt j<br />
+			&emsp;&emsp;&emsp;swap A[i] with A[j]<br />
+			&emsp;&emsp;else<br />
+			&emsp;&emsp;&emsp;swap A[low] with A[j]<br />
+			&emsp;&emsp;&emsp;return j<br />
+			</div>
+			
+		<p>
+			Perform a Hoare partition of the values in ascending order. For information about the Hoare Partition and quickSort, click <a target=\"_blank\" href="https://en.wikipedia.org/wiki/Quicksort"> here</a>.
+			<br />
+			Input the appropriate index number in the yellow and purple slots as to how the Hoare algorithm would swap the data.
+			<br />
+			Hit the continue button to demonstrate the partition step by step.
+			<br />
+			How many elements do you want to partition?:
+			<select style="width:80px" id="NumElements" name="NumElements">
+				<option value="" selected disabled hidden>Elements</option>
+				<option>5</option>
+				<option>6</option>
+				<option>7</option>
+				<option>8</option>
+				<option>9</option>
+				<option>10</option>
+			</select>
+		</p>
+
+		<script>
+			document.getElementById("NumElements").onchange = function() {funNumElements()};
+		</script>
+		<input style="visibility:visible;" type="button" id="ButtonStart" value="Start" onclick="nextStep(3)" enabled>
+		<button id="ButtonSwap" style="visibility:hidden;" onclick="nextStep(1) ">Swap</button>
+		<button id="ButtonContinue" style="visibility:hidden;"  onclick="nextStep(3) ">Continue</button>	
+		<BR>
+	
+</body>
+</html>
