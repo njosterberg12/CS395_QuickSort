@@ -125,7 +125,13 @@
 
 			function funNumElements()
 			{
+
 				numElements = parseInt(document.getElementById("NumElements").value, 10);
+
+				//if(numElements == NULL)
+				//{
+				//	hideElement("ButtonStart");
+				//}
 				createArrayTable();
 			}
 			function createArrayTable()
@@ -159,8 +165,8 @@
 				setCellCSSClass(myTableId, numElements-1, 2, "jBox");
 				setInputCellColor(myTableId, numElements-2, 2, "#FEFEA6");
 				setInputCellColor(myTableId, numElements-1, 2, "rgb(226, 166, 254)");
-				setPlaceholder(myTableId, numElements-2, 2, "i");
-				setPlaceholder(myTableId, numElements-1, 2, "j");
+				setPlaceholder(myTableId, numElements-2, 2, "[i]");
+				setPlaceholder(myTableId, numElements-1, 2, "[j]");
 				setInputCellColor(myTableId, 0, 1, "yellow");
 				
 				//Put table cells into array for easy access
@@ -195,11 +201,9 @@
 					{
 						arr[x].disabled = true;
 					}
-
 					//pivot = parseInt(getCellValue(myTableId, 0, 1));
 					low = 0; // first element in the array"
 					high = numElements - 1; // this is the last element in the array
-					
 					pivot = arr[0].value;
 					i = 0;
 					j = high;
@@ -216,22 +220,26 @@
 				{
 					if(state===1)
 					{
-						/*if(swapVar === 1 && checkedi)
+						if(swapVar === 1 && checkedi)
 						{
-							console.log("iVal", i);
-							while(parseInt(getInputCellValue(myTableId, numElements-2, 2)) != i)
+							console.log("iVal: ", i);
+							console.log("arr[i]: ", arr[i].value);
+							if(parseInt(getInputCellValue(myTableId, numElements-2, 2)) != i)
 							{
-								appendPseudocode(myPseudocodeTableId, "Incorrect i value. Find a position A[ i ] > " + pivot);
+								appendPseudocode(myPseudocodeTableId, "Incorrect i value. Find the next (i) index value where A[ i ] > " + pivot);
+								return;
 							}
 						}
 						if(swapVar === 1 && checkedj)
 						{
-							console.log("jVal", j);
-							while(parseInt(getInputCellValue(myTableId, numElements-1, 2)) != j)
+							console.log("jVal: ", j);
+							console.log("arr[j]: ", arr[j].value);
+							if(parseInt(getInputCellValue(myTableId, numElements-1, 2)) != j)
 							{
-								appendPseudocode(myPseudocodeTableId, "Incorrect j value. Find a position A[ j ] < " + pivot);
+								appendPseudocode(myPseudocodeTableId, "Incorrect j value. Find the next (j) index value where A[ j ] < " + pivot);
+								return;
 							}
-						}*/
+						}
 						if(swapVar===3)
 						{
 							//return;
@@ -284,9 +292,9 @@
 					console.log("i val: ", i, ", j val: ", j);
 					state = 1;
 					appendPseudocode(myPseudocodeTableId, "Increment i while A[i] <= pivot && i < high");
-					appendPseudocode(myPseudocodeTableId, "*Enter i value in the box*");
+					appendPseudocode(myPseudocodeTableId, "*Enter (i) index value in the box*");
 					appendPseudocode(myPseudocodeTableId, "Decrement j while A[j] <= pivot && j > low");
-					appendPseudocode(myPseudocodeTableId, "*Enter j value in the box*");
+					appendPseudocode(myPseudocodeTableId, "*Enter (j) index value in the box*");
 					appendPseudocode(myPseudocodeTableId, "*Press Swap button when you have picked the swap values*");
 					appendPseudocode(myPseudocodeTableId, "-------------------------------------------");
 					while((arr[i].value <= pivot) && (i < high))
@@ -464,9 +472,9 @@
 		<p>
 			Perform a Hoare partition of the values in ascending order. For information about the Hoare Partition and quickSort, click <a target=\"_blank\" href="https://en.wikipedia.org/wiki/Quicksort"> here</a>.
 			<br />
-			<a target=\"_blank\" href="../4_lomuto.html"> Lomuto Partition</a>
+			Input the appropriate index number in the yellow and purple slots as to how the Hoare algorithm would swap the data.
 			<br />
-			Input the appropriate number in the slot as to how the Hoare algorithm would partition the data.
+			Hit the continue button to demonstrate the partition step by step.
 			<br />
 			How many elements do you want to partition?:
 			<select style="width:80px" id="NumElements" name="NumElements">
