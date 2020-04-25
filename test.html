@@ -15,6 +15,7 @@
 			{
 				font-size: 35px;
 				height: 50px;
+				width: 40px;
 				text-align: center;
 				border-style: solid;
 				border-width: 2px;
@@ -25,21 +26,43 @@
 			{
 				font-size: 35px;
 				height: 50px;
+				width: 40px;
 				text-align: center;
 				padding-right: 10px;
 				padding-left: 10px;
 				border-style: solid;
 				border-width: 2px;
 				border-color: black;
-				background-color:#DEDEDE;
+				background-color:#39DB77;
 			}
 			.markerCellFormat
 			{
-				font-size: 35px;
-				width: 70px;
+				font-size: 25px;
 				height: 50px;
+				width: 40px;
 				text-align: center;
-				border-style: none;
+				border-style: solid;
+				border-width: 0px;
+				background-color: #FFFFFF;
+			}
+			.iBox
+			{
+				font-size: 15px;
+				height: 50px;
+				width: 40px;
+				text-align: center;
+				border-style: solid;
+				border-width: 0px;
+				background-color: #FFFFFF;
+			}
+			.jBox
+			{
+				font-size: 15px;
+				height: 50px;
+				width: 50px;
+				text-align: center;
+				border-style: solid;
+				border-width: 0px;
 				background-color: #FFFFFF;
 			}
 			.arrayTableFormat
@@ -55,7 +78,18 @@
 				margin-top: 8px; 
 				border: 10px;
 				border-style: ridge;
-  				border-color: #39DB77
+  				border-color: rgb(55, 63, 58)
+			}
+			.highlighted {
+				font-size: 35px;
+				height: 50px;
+				width: 40px;
+				padding-right: 10px;
+				padding-left: 10px;
+				text-align: center;
+				border-style: solid;
+				border-color: black;
+  				background-color: cyan;
 			}
 		</style>
 		<script type="text/javascript">
@@ -73,11 +107,31 @@
 
 			var currentMode = 0;
 			var initialji = 0;
-			var currentState = 0;
-			var currentSplitValue = 0;
+			var arr;
+			var high;
+			var low;
+			var i;
+			var j;
+			var ilessthanj = true;
+			var started = false;
+			var state;
+			var checkedi = false;
+			var checkedj = false;
+			var checkedLow = false;
+			
+			//var low; 
+			//var high;
+			//var pivot;
+
 			function funNumElements()
 			{
+
 				numElements = parseInt(document.getElementById("NumElements").value, 10);
+
+				//if(numElements == NULL)
+				//{
+				//	hideElement("ButtonStart");
+				//}
 				createArrayTable();
 			}
 			function createArrayTable()
@@ -86,7 +140,7 @@
 				createTable(myTableId, numElements, 3);
 				setTableCSSClass(myLabelTableId, "arrayTableFormat");
 				setTableCSSClass(myTableId, "arrayTableFormat");
-				setCell(myLabelTableId, 0, 0, "i:");
+				setCell(myLabelTableId, 0, 0, "index:");
 				setCell(myLabelTableId, 0, 1, "value:");
 				setCellCSSClass(myLabelTableId, 0, 0, "labelCellFormat");
 				setCellCSSClass(myLabelTableId, 0, 1, "labelCellFormat");
@@ -98,24 +152,202 @@
 
 				for(x = 0; x < numElements; x++)
 				{
-					setCell(myTableId, x, 1, getRandomCount(50));
-					setCellCSSClass(myTableId, x, 1, "arrayCellFormat")
+					setCellAsInputBox2(myTableId, x, 1, getRandomCount(99));
+					//setCellCSSClass(myTableId, x, 1, "arrayCellFormat")
 				}
-				for(x = 0; x < numElements; x++)
+				for(x = 0; x < numElements-2; x++)
 				{
 					setCellCSSClass(myTableId, x, 2, "markerCellFormat");
 				}
-				var low = 0; // first element in the array"
-				var high = numElements - 1; // this is the last element in the array
+				setCellAsInputBox2(myTableId, numElements-2, 2, "");
+				setCellAsInputBox2(myTableId, numElements-1, 2, "");
+				setCellCSSClass(myTableId, numElements-2, 2, "iBox");
+				setCellCSSClass(myTableId, numElements-1, 2, "jBox");
+				setInputCellColor(myTableId, numElements-2, 2, "#FEFEA6");
+				setInputCellColor(myTableId, numElements-1, 2, "rgb(226, 166, 254)");
+				setPlaceholder(myTableId, numElements-2, 2, "[i]");
+				setPlaceholder(myTableId, numElements-1, 2, "[j]");
+				setInputCellColor(myTableId, 0, 1, "yellow");
+				
+				//Put table cells into array for easy access
+   				arr = document.getElementsByClassName("arrayCellFormat");
 				createPseudocodeTable(myPseudocodeTableId);
+				started = false;
+				showElement("ButtonStart", "Start");
+				hideElement("ButtonSwap");
+				//showElement("ButtonSwap", "Swap");
+				hideElement("ButtonContinue");
+
 				console.clear();
 				console.log("Before - ");
-				printArrayTable(myTableId, numElements);
-				//quickSort(myTableId, low, high);
-				doNextStep(low, high, currentState);
-				console.log("After - ");
-				printArrayTable(myTableId, numElements);
+				printArray();
+				//quickSort(low, high);
+				//console.log("After - ");
+				//printArray();
 
+			}
+			function nextStep(swapVar)
+			{
+				console.log("nextStep()" + swapVar);
+				if(!started)
+				{
+					if(swapVar !== 3)
+						return;
+					started = true;
+					showElement("ButtonSwap");
+					hideElement("ButtonStart");
+					showElement("ButtonContinue");
+					for(var x = 0; x < numElements; x++)
+					{
+						arr[x].disabled = true;
+					}
+					//pivot = parseInt(getCellValue(myTableId, 0, 1));
+					low = 0; // first element in the array"
+					high = numElements - 1; // this is the last element in the array
+					pivot = arr[0].value;
+					i = 0;
+					j = high;
+					appendPseudocode(myPseudocodeTableId ,"Set first element as pivot. Pivot = " + pivot);
+					
+					ilessthanj = true;
+					//pivot = arr[0];
+
+					console.log("pivot val:", pivot);
+					state = 0;
+					nextStep(3);
+				}
+				else
+				{
+					if(state===1)
+					{
+						if(swapVar === 1 && checkedi)
+						{
+							console.log("iVal: ", i);
+							console.log("arr[i]: ", arr[i].value);
+							if(parseInt(getInputCellValue(myTableId, numElements-2, 2)) != i)
+							{
+								appendPseudocode(myPseudocodeTableId, "Incorrect i value. Find the next (i) index value where A[ i ] > " + pivot);
+								return;
+							}
+						}
+						if(swapVar === 1 && checkedj)
+						{
+							console.log("jVal: ", j);
+							console.log("arr[j]: ", arr[j].value);
+							if(parseInt(getInputCellValue(myTableId, numElements-1, 2)) != j)
+							{
+								appendPseudocode(myPseudocodeTableId, "Incorrect j value. Find the next (j) index value where A[ j ] < " + pivot);
+								return;
+							}
+						}
+						if(swapVar===3)
+						{
+							//return;
+						}
+					}
+					else if(state === 0 && swapVar !== 3)
+					{
+						return;
+					}
+					//clear();
+					hoare();
+				}
+				if(swapVar!==3)
+				{
+					nextStep(3);
+				}
+				
+			}
+			function hoare()
+			{
+				
+				if(checkedi && checkedj && ilessthanj)
+				{
+					checkedi = false;
+					checkedj = false;
+					printArray();
+					appendPseudocode(myPseudocodeTableId, "Swapping A["+i+"] and A["+j+"]");
+					console.log("Swap A["+i+"] with A["+j+"]"); // i = " + i + " j = " + j);
+					swap(arr[i], arr[j]);
+					printArray();
+				}
+				else if(checkedi && checkedj && !ilessthanj)
+				{
+					console.log("i val: ", i, ", j val: ", j);
+					console.log("i is not < j, swap A[low] and A[j]");
+					appendPseudocode(myPseudocodeTableId, arr[i].value +" is NOT < "+arr[j].value+ " swap A[low] and A[j]");
+					checkedi = false;
+					checkedj = false;
+					setInputCellColor(myTableId, 0, 1, "#39DB77");
+					setInputCellColor(myTableId, j, 1, "yellow");
+					printArray();
+					console.log("Swap A[low] with A[j] // low = " + low + " j = " + j);
+					swap(arr[low], arr[j]);
+					printArray();
+					hideElement("ButtonSwap");
+					hideElement("ButtonStart");
+				}
+				else if(i < j)
+				{
+					console.log("i val: ", i, ", j val: ", j);
+					state = 1;
+					appendPseudocode(myPseudocodeTableId, "Increment i while A[i] <= pivot && i < high");
+					appendPseudocode(myPseudocodeTableId, "*Enter (i) index value in the box*");
+					appendPseudocode(myPseudocodeTableId, "Decrement j while A[j] <= pivot && j > low");
+					appendPseudocode(myPseudocodeTableId, "*Enter (j) index value in the box*");
+					appendPseudocode(myPseudocodeTableId, "*Press Swap button when you have picked the swap values*");
+					appendPseudocode(myPseudocodeTableId, "-------------------------------------------");
+					while((arr[i].value <= pivot) && (i < high))
+					{
+						console.log("i++");
+						i++;
+					}
+					checkedi = true;
+					while((arr[j].value >= pivot) && (j > low))
+					{
+						console.log("j--");
+						j--;
+					}
+					checkedj = true;
+					if(!(i < j))
+					{
+						console.log("ilessthanj = false");
+						ilessthanj = false;
+					}
+					console.log("i val: ", i, ", j val: ", j);
+				}
+				else
+				{
+					console.log("i val: " + i + ", j val: " + j);
+					appendPseudocode(myPseudocodeTableId, "Finished");
+					console.log("Finished");
+				}
+			}
+			
+			//Sets cell as input box and applies CSS Class
+			function setCellAsInputBox2(myTableId, x,y, initialValue) 
+			{
+  				var myTable = document.getElementById(myTableId); 
+  				var input = document.createElement("input");
+ 				input.type = "text";
+  				input.className = "arrayCellFormat"; // set the CSS class
+  				input.value = initialValue;
+  				//input.style["width"] = "32px";
+  				//input.onchange = "inputBoxChanged("+x+","+y+")";
+  				//input.onchange = function() {inputBoxChanged(myTableId, x, y)};
+  				var mycell = myTable.rows[y].cells[x];
+				if (mycell.hasChildNodes()) 
+				{
+     				mycell.removeChild(mycell.childNodes[0]);
+  				} 
+  				mycell.appendChild(input);  
+  				input.focus();  
+			}
+			function setPlaceholder(myTableId, x, y, placeholderText)
+			{
+				var myTable = document.getElementById(myTableId);
+				var mycell = myTable.rows[y].cells[x];
+				mycell.childNodes[0].placeholder = placeholderText;
 			}
 			function setCellCSSClass(myTableId, x, y, applyClass)
 			{
@@ -128,167 +360,99 @@
 				var myTable = document.getElementById(myTableId);
 				myTable.className = applyClass;
 			}
-			function printArrayTable(myTableId, numElements)
+			function printArray()
 			{
 				var ar=[];
-				for(i = 0; i < numElements; i++)
+				for(var c = 0; c < numElements; c++)
 				{
-					ar.push(getCellValue(myTableId, i, 1));
+					ar.push(Number(arr[c].value));
 				}
 				console.log("Array: " + ar.join(' '));
 			}
-
-			function quickSort(myTableId, low, high)
+			function quickSort(low, high)
 			{
 				//appendPseudocode(myPseudocodeTableId, "quickSort()");
 				//appendPseudocode(myPseudocodeTableId, "if low >= high");
 				
 				if(low < high)
 				{
-					console.log("QuickSort() //low=%d; high=%d",low, high);
-					var split = hoarePartition(myTableId, low, high);
+					console.log("quickSort() //low=%d; high=%d",low, high);
+					printArray();
+					clear();
+					var split = hoarePartition(low, high);
 					console.log("var split = ", split);
-					quickSort(myTableId, low, split-1);
-					quickSort(myTableId, split + 1, high);
+					quickSort(low, split-1);
+					quickSort(split + 1, high);
 				}
 			}
-			function hoarePartition(myTableId, low, high)
+			function hoarePartition(low, high)
 			{
-				console.log("HoarePartition()");
-				var pivot = parseInt(getCellValue(myTableId, low, 1), 10); // pivot is shifted to the right as the values below low val are ordered
+				console.log("partition() //low=%d; high=%d", low, high);
+				var pivot = Number(arr[low].value); // pivot is shifted to the right as the values below low val are ordered
 				console.log("pivot val: ", pivot);
 				var i = low;
 				var j = high;
 				while(true)
 				{
-					while ((parseInt(getCellValue(myTableId, i, 1), 10) <= pivot) && (i < high))
+					while (arr[i].value <= pivot && (i < high))
 					{
 						i++;
 						console.log("i: %d", i);
 					}
-					while (parseInt(getCellValue(myTableId, j, 1), 10) >= pivot && j > low)
+					while (arr[j].value >= pivot && (j > low))
 					{
 						j--;
 						console.log("j: %d", j);
 					}
 					if(i < j)
 					{
-						swap(myTableId, i, j);
+						swap(arr[i], arr[j]);
 					}
 					else
 					{
-						swap(myTableId, low, j);
+						swap(arr[low], arr[j]);
 						return j;
 					}
 				}
 			}
-			async function doNextStep(low, high, currentState)
+			function swap(a, b)
 			{
-				switch(currentState)
-				{
-					case 0:
-						//Call quicksort()
-						if(low < high)
-						{
-							appendPseudocode(myPseudocodeTableId, "QuickSort(A, low, high) //low=%d, high=%d", low, high);
-							appendPseudocode(myPseudocodeTableId, "	if low < high");
-							appendPseudocode(myPseudocodeTableId, "		split = HoarePartition(A, low, high)");
-							currentState = 1;
-							await doNextStep(low, high, currentState);
-							appendPseudocode(myPseudocodeTableId, "QuickSort(A, low, split - 1)");
-							await doNextStep(low, currentSplitValue - 1, 0);
-							appendPseudocode(myPseudocodeTableId, "QuickSort(A, split + 1, high)");
-							await doNextStep(currentSplitValue + 1, high, 0);
-						}
-						break;
-					case 1:
-						appendPseudocode(myPseudocodeTableId, "HoarePartition(A, low, high)");
-						appendPseudocode(myPseudocodeTableId, "	pivot=A[low]");
-						appendPseudocode(myPseudocodeTableId, "	i := low");
-						appendPseudocode(myPseudocodeTableId, "	j := high");
-						appendPseudocode(myPseudocodeTableId, "	repeat forever");
-						currentState = 2;
-						await doNextStep(low, high, currentState);
-						break;
-					case 2:
-						appendPseudocode(myPseudocodeTableId, " while (A[i] <= pivot && i < high)");
-						appendPseudocode(myPseudocodeTableId, "	 i++");
-						currentState = 3;
-						await doNextStep(low, high, currentState);
-						break;
-					case 3:	
-						appendPseudocode(myPseudocodeTableId, " while (A[j] >= pivot && j > low)");
-						appendPseudocode(myPseudocodeTableId, "	 j--");
-						currentState = 4;
-						await doNextStep(low, high, currentState);
-						break;
-					case 4:
-						appendPseudocode(myPseudocodeTableId, "if (i < j)");
-						if (low < high)
-						{
-							appendPseudocode(myPseudocodeTableId, "swap A[i] with A[j]");
-							currentState = 2;
-							await doNextStep(low, high, currentState);
-						}
-						else
-						{
-							appendPseudocode(myPseudocodeTableId, "else")
-							appendPseudocode(myPseudocodeTableId, "swap A[low] with A[j]");
-							appendPseudocode(myPseudocodeTableId, "return j");
-						}
-						break;
-					/*case 5:
-						appendPseudocode(myPseudocodeTableId, "split= %d");
-						appendPseudocode(myPseudocodeTableId, "quicksort(A, low, split - 1 // low=%d, split=%d", low, high);
-						currentState = 1;
-						await doNextStep(low, high);
-						break;
-					case 6:
-						appendPseudocode(myPseudocodeTableId, "quicksort(A, split + 1, high) // split=%d, high=%d");
-						currentState = 1;
-						await doNextStep(low, high);
-						break;*/
-					default:
-						break;
-				}
-			}
-
-			function swap(myTableId, i, j)
-			{
-				printArrayTable(myTableId, numElements);
-				console.log("swap A[" + i + "] and A[" + j + "]");
-				var temp = getCellValue(myTableId, i, 1);
-				setCell(myTableId, i, 1, getCellValue(myTableId, j, 1));
-				setCell(myTableId, j, 1, temp);
-				printArrayTable(myTableId, numElements);
+   			//a.setAttribute("class", "highlighted");
+   			//b.setAttribute("class", "highlighted");
+   			var temp = a.value;
+   			a.value = b.value;
+   			b.value = temp;
 			}
 			function welcome()
 			{
 				sayIt("QuickSort");
 			}
-			async function delay(delayInms) {
+			async function delay(delayInms) 
+			{
       			return new Promise(resolve  => {
         		setTimeout(() => {
           		resolve(2);
         			}, delayInms);
-      });
-    }
+      			});
+			}
+			function clear()
+			{
+				for(var index = 0; index < numElements; index++)
+				{
+					arr[index].setAttribute("class", "arrayCellFormat");
+					setInputCellColor(myTableId, index, 1, "#DEDEDE");
+
+				}
+			}
 		</script>
 	</head>
 	<body>
 		<!--Header-->
 		<script>
-			createHeader("Quick Sort");
+			createHeader("Hoare Partition");
 		</script>
 			<div class="boxed" style="float:right;">
 			<u>Algorithm Pseudocode:</u><br />
-			//Input: Array, Left index, Right index<br/><br/>
-			QuickSort(A, low, high)<br />
-			&emsp;if low &lt; high then<br />
-			&emsp;&emsp;split := HoarePartition(A, low, high)<br />
-			&emsp;&emsp;quicksort(A, low, split - 1)<br />
-			&emsp;&emsp;quicksort(A, split + 1, high)<br />
-			<br />
 			HoarePartition(A, low, high)<br />
 			&emsp;pivot := A[low]<BR>
 			&emsp;i := low<br />
@@ -303,13 +467,16 @@
 			&emsp;&emsp;else<br />
 			&emsp;&emsp;&emsp;swap A[low] with A[j]<br />
 			&emsp;&emsp;&emsp;return j<br />
-			</div>	
+			</div>
+			
 		<p>
-			Perform a quicksort of the values in ascending order. For information about quicksort, click <a target=\"_blank\" href="https://en.wikipedia.org/wiki/Quicksort"> here</a>.
+			Perform a Hoare partition of the values in ascending order. For information about the Hoare Partition and quickSort, click <a target=\"_blank\" href="https://en.wikipedia.org/wiki/Quicksort"> here</a>.
 			<br />
-			Input the appropriate number in the slot as to how a quickSort would sort the data.
+			Input the appropriate index number in the yellow and purple slots as to how the Hoare algorithm would swap the data.
 			<br />
-			How many elements do you want to sort?:
+			Hit the continue button to demonstrate the partition step by step.
+			<br />
+			How many elements do you want to partition?:
 			<select style="width:80px" id="NumElements" name="NumElements">
 				<option value="" selected disabled hidden>Elements</option>
 				<option>5</option>
@@ -324,11 +491,9 @@
 		<script>
 			document.getElementById("NumElements").onchange = function() {funNumElements()};
 		</script>
-		<input style="visibility:visible;" type="button" id="ButtonShowMe" value="Show Me" onclick="(nextStep())" enabled>
-		<input style="visibility:visible;" type="button" id="i_plus_plus" value="i++" onclick="incrementI()" disabled>
-		<input style="visibility:visible;" type="button" id="j_minus_minus"value="j--" onclick="decrementJ()" disabled>
-		<input style="visibility:visible;" type="button" id="swap()"value="swap A[i] with A[j]" onclick="swap()" disabled>
-		<input style="visibility:visible;" type="button" id="swap()"value="swap A[low] with A[j] & return j" onclick="swap()" disabled>
+		<input style="visibility:visible;" type="button" id="ButtonStart" value="Start" onclick="nextStep(3)" enabled>
+		<button id="ButtonSwap" style="visibility:hidden;" onclick="nextStep(1) ">Swap</button>
+		<button id="ButtonContinue" style="visibility:hidden;"  onclick="nextStep(3) ">Continue</button>	
 		<BR>
 	
 </body>
