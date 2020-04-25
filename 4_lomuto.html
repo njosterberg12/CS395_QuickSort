@@ -59,17 +59,32 @@ function step(swapVar){
 	  showElement("ButtonSwap", "Swap");
 	  showElement("ButtonDont", "Don't Swap");
 	  step(3);
-   } else {
+   } 
+   else
+   {
 	   
-	  if( state===1){
-		if( swapVar === 0 && checked){
-			appendPseudocode(PSID, "You should swap because " + arr[j].value + "<=" + pivotVal );
-			return;
-		}else if(swapVar === 1 && !checked){
-			appendPseudocode(PSID, "You should NOT swap because " + arr[j-1].value + ">" + pivotVal);
-			return;
-		}else if(swapVar === 3) return;
-	  }else if(state === 0 && swapVar !== 3) return;
+     if( state===1)
+     {
+
+         if( swapVar === 0 && checked)
+         {
+			   appendPseudocode(PSID, "You should swap because " + arr[j].value + "<=" + pivotVal );
+			   return;
+         }
+         else if(swapVar === 1 && !checked)
+         {
+			   appendPseudocode(PSID, "You should NOT swap because " + arr[j-1].value + ">" + pivotVal);
+			   return;
+         }
+         else
+         if(swapVar === 3) 
+            return;
+     }
+     else 
+     {
+         if(state === 0 && swapVar !== 3) 
+            return;
+     }
 	  
       clear();
       lomuto();
@@ -89,36 +104,48 @@ function swap(a, b) {
 }
 
 function lomuto() {
-   if(checked) {
+   if(checked) 
+   {
       checked = false;
       swap(arr[tmp], arr[j]);
       tmp++;
       j++;
-   } else {
-	  arr[tmp].setAttribute("class", "highlighted");
-      if(j < hi) {
+   } 
+   else 
+   {
+	   arr[tmp].setAttribute("class", "highlighted");
+      if(j < hi) 
+      {
          appendPseudocode(PSID, "Test "+ arr[j].value +" against the pivot (Swap or don't swap)");
 		 state=1;
          arr[j].setAttribute("class", "testing");
-         if(Number(arr[j].value) <= pivotVal) {
+         if(Number(arr[j].value) <= pivotVal)
+         {
             checked = true;
-         } else {
+         } 
+         else 
+         {
             j++;
          }
-      } else if(j === hi) {
+      } 
+      else if(j === hi) 
+      {
 		 appendPseudocode(PSID,"One final swap to put the pivot in the correct place");
          swap(arr[tmp-1], arr[lo]);
          j++;
 		 showElement("ButtonContinue", "Continue");
 		 hideElement("ButtonSwap");
 		 hideElement("ButtonDont");
-         for(var i = 0; i < arr.length; i++) {
+         for(var i = 0; i < arr.length; i++) 
+         {
             arr[i].setAttribute("class", "finished");
          }
          arr[tmp-1].setAttribute("class", "pivot");		 
-      }else {
+      }else 
+      {
          appendPseudocode(PSID,"Finished!");
-         for(var i = 0; i < arr.length; i++) {
+         for(var i = 0; i < arr.length; i++) 
+         {
             arr[i].setAttribute("class", "finished");
          }
          arr[tmp-1].setAttribute("class", "pivot");
@@ -156,4 +183,4 @@ function lomuto() {
 		<input style="visibility:hidden;" type="button" id="ButtonYes" value="Yes" onclick="choseYes()" disabled>
 		<input style="visibility:hidden;" type="button" id="ButtonNo"value="No" onclick="choseNo()" disabled>
 	</body>
-</html>
+</html>d
